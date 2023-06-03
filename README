@@ -1,0 +1,15 @@
+For the moment there is only a parser.
+
+It's called ParserConfig and take the configfile in his constructor.
+
+ParserConfig, create a constainers list that's contains Server object.
+
+A Server object just contains the data extracted from config file.
+
+---
+
+You can find the main for testing 
+
+---
+
+There is too a Log object who's print a message with time. 
