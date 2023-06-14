@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/03 19:30:09 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/03 19:30:10 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/14 03:16:39 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,8 +94,8 @@ void	Location::setRoot(std::string value)
 {
 	isValidToken(value);
 	Log(GREEN, "PARSING", "SET LOCATION ROOT: " + value);
-	if(!(isDirectory(value)))
-		throw std::runtime_error("Root path is not a directory");
+	// if(!(isDirectory(value)))
+	// 	throw std::runtime_error("Root path is not a directory");
 	_root = value;
 }
 

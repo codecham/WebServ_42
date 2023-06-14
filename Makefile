@@ -1,11 +1,13 @@
 NAME			=	webserv
 
-SRCS			=	main.cpp \
-					utils/Log.cpp \
-					ParserConfig/ParserConfig.cpp \
-					utils/utils.cpp \
-					Server/Server.cpp \
-					Server/Location.cpp \
+SRCS			=	srcs/main.cpp \
+					srcs/utils/Log.cpp \
+					srcs/ParserConfig/ParserConfig.cpp \
+					srcs/utils/utils.cpp \
+					srcs/utils/utils2.cpp \
+					srcs/Server/Server.cpp \
+					srcs/Server/Location.cpp \
+					srcs/Request/Request.cpp \
 
 CC				=	clang++
 

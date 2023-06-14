@@ -6,11 +6,15 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:48:52 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/05/25 20:53:59 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/14 03:46:53 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/webserv.hpp"
+#include "../../includes/webserv.hpp"
+
+/*
+	Return true if the string is empty or just contains space or tabulation
+*/
 
 bool emptyline(std::string& str)
 {
@@ -23,6 +27,11 @@ bool emptyline(std::string& str)
 		return(true);
 	return(false);
 }
+
+/*
+	Work like ft_split in libft.
+	Cut a string on each character c and put the each part in a vector
+*/
 
 std::vector<std::string>	splitInVector(std::string& str, char c)
 {
@@ -41,6 +50,10 @@ std::vector<std::string>	splitInVector(std::string& str, char c)
 	return(split);
 }
 
+/*
+	Take a string and remove all spaces and tabulations at begin and at the end 
+*/
+
 void strTrimedWhiteSpace(std::string& str)
 {
 	std::size_t first_char_pos = str.find_first_not_of(" \t");
@@ -55,6 +68,10 @@ void strTrimedWhiteSpace(std::string& str)
 	else if (last_char_pos != std::string::npos)
 		str = str.substr(0, last_char_pos - str.size());
 }
+
+/*
+	Split a combination of KEY VALUE speratate by space
+*/
 
 std::vector<std::string> split_key_value(std::string& str)
 {
@@ -77,6 +94,10 @@ std::vector<std::string> split_key_value(std::string& str)
 	return(vec);
 }
 
+/*
+	Just a function for the parsing
+*/
+
 std::map<int, std::vector<std::string> > extractFileInMap(std::ifstream& file)
 {
 	std::map<int, std::vector<std::string> > map;
@@ -93,11 +114,19 @@ std::map<int, std::vector<std::string> > extractFileInMap(std::ifstream& file)
 	return(map);
 }
 
+/*
+	take a file path and return true if it's exist
+*/
+
 bool pathToFileExist(const std::string& path) 
 {
 	std::ifstream file(path.c_str());
 	return (file.is_open());
 }
+
+/*
+	take a directory path and return true if it's exist
+*/
 
 bool isDirectory(const std::string& path) 
 {

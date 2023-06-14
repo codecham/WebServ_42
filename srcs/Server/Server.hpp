@@ -6,14 +6,14 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 01:26:04 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/03 22:34:20 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/14 04:51:47 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
-#include "../includes/webserv.hpp"
+#include "../../includes/webserv.hpp"
 #include <iostream>
 #include <string>
 #include <map>
@@ -31,6 +31,7 @@
 	ErrorPages	->		Specify a file to send for a specific code
 	MaxBodySize ->		max request body size in bytes
 	Root		->		root folder of site directory, (full relative path mandatory ?)
+	Index		->		Main page 
 */
 
 class Location;
@@ -49,6 +50,8 @@ class Server
 		void setMaxBodySize(std::string value);
 		void setErrorPage(std::string value);
 		void setDefault(bool value);
+		void setRoot(std::string value);
+		void setIndex(std::string value);
 		void setLocation(std::string path, Location location);
 
 		/*-----------GETTERS------------*/
@@ -59,13 +62,16 @@ class Server
 		std::map<short, std::string>	getErrorPages() const;
 		std::string 					getErrorPageCode(short code);
 		bool 							getIsDefault() const;
+		std::string						getRoot() const;
+		std::string						getIndex() const;
 		std::map<std::string, Location> getLocation() const;
+		Location						getLocationByPath(std::string path);
 
 		/*-----------MEMBERS FUNCTIONS------------*/
 
-		void isValidToken(std::string& token) const;
-		bool isValidHost(std::string host) const;
-		// void setupServer(void);
+		bool locationExist(std::string path);
+		void createSocket();
+		void closeSocket();
 		
 	private:
 		in_addr_t 						_host;
@@ -74,9 +80,14 @@ class Server
 		unsigned int					_max_body_size;
 		std::map<short, std::string>  	_error_pages;
 		bool							_is_default;
+		std::string						_root;
+		std::string						_index;
 		std::map<std::string, Location> _locations;
 		int 							_listen_fd;
-		int								fd;
+		int								_fd;
+		
+		void isValidToken(std::string& token) const;
+		bool isValidHost(std::string host) const;
 };
 
 std::ostream& operator<<(std::ostream& os, const Server& server);

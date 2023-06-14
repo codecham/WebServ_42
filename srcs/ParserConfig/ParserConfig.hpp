@@ -6,14 +6,14 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 00:00:25 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/03 22:51:26 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/14 03:19:10 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef PARSERCONFIG_HPP
 #define PARSERCONFIG_HPP
 
-#include "../includes/webserv.hpp"
+#include "../../includes/webserv.hpp"
 #include <iostream>
 #include <string>
 #include <stdexcept>

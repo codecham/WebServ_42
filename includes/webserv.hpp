@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:35:35 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/03 22:33:32 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/14 03:17:49 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,16 +26,20 @@
 #define POST 1
 #define DELETE 2
 
-#include "../utils/Log.hpp"
-#include "../ParserConfig/ParserConfig.hpp"
-#include "../Server/Server.hpp"
-#include "../Server/Location.hpp"
+#include "../srcs/utils/Log.hpp"
+#include "../srcs/ParserConfig/ParserConfig.hpp"
+#include "../srcs/Server/Server.hpp"
+#include "../srcs/Server/Location.hpp"
+#include "../srcs/Request/Request.hpp"
 
 #include <map>
 #include <vector>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>

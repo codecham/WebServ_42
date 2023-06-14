@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:27:44 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/03 20:03:01 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/14 03:18:55 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 #include <string>
 #include <ctime>
 #include <sys/time.h>
-#include "../includes/webserv.hpp"
+#include "../../includes/webserv.hpp"
 
 class Log
 {

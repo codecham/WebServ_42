@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 13:39:18 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/03 22:51:52 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/14 04:05:17 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ Server::Server()
 	_port = 0;
 	_host = 0;
 	_name = "";
+	_index = "";
+	_root = "";
 	_max_body_size = 0;
 	_error_pages[301] = "";
 	_error_pages[302] = "";
@@ -39,7 +41,7 @@ Server::Server()
 	_error_pages[505] = "";
 	_is_default = false;
 	_listen_fd = 0;
-	fd = 0;
+	_fd = 0;
 }
 
 Server::Server(const Server& copy)
@@ -53,6 +55,9 @@ Server::Server(const Server& copy)
 		_error_pages = copy._error_pages;
 		_is_default = copy._is_default;
 		_locations = copy._locations;
+		_fd = copy._fd;
+		_index = copy._index;
+		_root = copy._root;
 	}
 }
 
@@ -72,6 +77,9 @@ Server&	Server::operator=(const Server& copy)
 		_error_pages = copy._error_pages;
 		_is_default = copy._is_default;
 		_locations = copy._locations;
+		_fd = copy._fd;
+		_index = copy._index;
+		_root = copy._root;
 	}
 	return(*this);
 }
@@ -156,6 +164,21 @@ void	Server::setErrorPage(std::string value)
 	_error_pages.insert(std::make_pair((short)tmp, vec[1]));
 }
 
+void	Server::setRoot(std::string value)
+{
+	isValidToken(value);
+	Log(GREEN, "PARSING", "SET ROOT: " + value);
+	_root = value;
+}
+
+void	Server::setIndex(std::string value)
+{
+	isValidToken(value);
+	Log(GREEN, "PARSING", "SET INDEX: " + value);
+	_index = value;
+	std::cout << BLUE << "index = " << _index << std::endl;
+}
+
 void 	Server::setLocation(std::string path, Location location)
 {
 	Log(GREEN, "PARSING", "ADD LOCATION TO SERVER CONFIG: " + path);
@@ -217,6 +240,28 @@ std::map<std::string, Location> Server::getLocation() const
 	return(_locations);
 }
 
+std::string 					Server::getRoot() const
+{
+	return(_root);
+}
+
+std::string						Server::getIndex() const
+{
+	return (_index);
+}
+
+Location 						Server::getLocationByPath(std::string path)
+{
+	return (_locations[path]);
+}
+
+bool							Server::locationExist(std::string path)
+{
+	if (_locations.find(path) != _locations.end())
+		return (true);
+	else
+		return (false);
+}
 
 /*
 	Members Functions
@@ -239,11 +284,49 @@ bool 	Server::isValidHost(std::string host) const
   	return (inet_pton(AF_INET, host.c_str(), &(sockaddr.sin_addr)) ? true : false);
 }
 
-// void	setupServer(void)
-// {
+void 	Server::createSocket()
+{
+	struct addrinfo *result;
+	struct addrinfo hints;
+	int ret;
+	struct addrinfo *tmp;
+	struct in_addr addr;
+	std::string ip;
 	
-	
-// }
+	addr.s_addr = _host;
+	ip = inet_ntoa(addr);
+	memset(&hints, 0, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	ret = getaddrinfo(inet_ntoa(addr), std::to_string(_port).c_str(), &hints, &result);
+	if (ret != 0)
+		throw std::runtime_error(gai_strerror(ret));
+	tmp = result;
+	while (tmp != NULL)
+	{
+		_fd = socket(tmp->ai_family, tmp->ai_socktype, tmp->ai_protocol);
+		if (_fd != -1)
+		{
+			if (bind(_fd, tmp->ai_addr, tmp->ai_addrlen) == 0)
+				break ;
+		}
+		tmp = tmp->ai_next;
+		close(_fd);
+	}
+	freeaddrinfo(result);
+	if (tmp == NULL)
+		throw std::runtime_error("Can't socket or bind host " + ip + ":" + std::to_string(_port));
+	if (!_name.empty())
+		Log(GREEN, "SERVER", "Socket for " + _name + " on " + ip + ":" + std::to_string(_port) + " successfully created");
+	else
+		Log(GREEN, "SERVER", "Socket for " + ip + ":" + std::to_string(_port) + " successfully created");
+}
+
+void	Server::closeSocket()
+{
+	close(_fd);
+	Log(YELLOW, "SERVER", "Socket closed");
+}
 
 /*
 	ostream operator
@@ -262,6 +345,8 @@ std::ostream& operator<<(std::ostream& os, const Server& server)
 	os << "Port: " << server.getPort() << std::endl;
 	os << "Name: " << server.getName() << std::endl;
 	os << "MaxBodySize: " << server.getMaxBodySize() << std::endl;
+	os << "Index: " << server.getIndex() << std::endl;
+	os << "Root: " << server.getRoot() << std::endl;
 	os << "IsDefault: " << server.getIsDefault() << std::endl;
 	if (!(location.empty()))
 	{

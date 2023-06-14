@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 00:29:48 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/03 19:59:35 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/14 02:58:16 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -184,6 +184,10 @@ void	ParserConfig::insertParamServer(Server& server, std::vector<std::string> to
 		server.setMaxBodySize(value);
 	else if (key == "error_page")
 		server.setErrorPage(value);
+	else if (key == "root")
+		server.setRoot(value);
+	else if (key == "index")
+		server.setIndex(value);
 	else
 		throw std::runtime_error("Invalid line");
 }
