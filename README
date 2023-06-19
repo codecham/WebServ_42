@@ -1,1 +1,20 @@
+For testing just do a make and try with:
 
+1: "curl localhost 4242" --> do a basic GET method
+
+2: "curl -X POST -d "Hello from curl!" http://localhost:4242" --> do a basic POST method
+
+3: localhost:4242 is a web browser for see a HTTP request created from browser
+
+
+---------------------------------------------------------------------------------
+
+You can configure the config file as you want!
+
+- If you configure a server on host 127.0.0.1 only you can send request
+
+- If you configure a server on host 0.0.0.0 all connexion from other computer can be accepted
+
+----------------------------------------------------------------------------------
+
+Sometimes, sockets can take a lot of time to close, so the program can insult you with an error because it fails to create a socket! When it's happends just change the port in config file !  

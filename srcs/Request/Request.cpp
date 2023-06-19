@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/13 00:53:15 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/14 02:22:57 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/19 02:31:19 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,11 @@ Request::Request()
 
 }
 
-Request::Request(std::string& str)
+Request::Request(Client& client)
 {
-	(void)str;
+	_allRequest = client.getDataRecv();
+	_bodySize = client.getBodySize();
+	parseRequest();
 }
 
 Request::Request(const Request& copy)
@@ -29,6 +31,8 @@ Request::Request(const Request& copy)
 	_version = copy._version;
 	_header = copy._header;
 	_body = copy._body;
+	_allRequest = copy._allRequest;
+	_bodySize = copy._bodySize;
 }
 
 Request::~Request()
@@ -45,9 +49,14 @@ Request&	Request::operator=(const Request& copy)
 		_version = copy._version;
 		_header = copy._header;
 		_body = copy._body;
+		_allRequest = copy._allRequest;
+		_bodySize = copy._bodySize;
 	}
 	return(*this);
 }
+
+
+/*-----------GETTERS------------*/
 
 std::string 						Request::getMethod()
 {
@@ -82,6 +91,18 @@ std::string							Request::getHeaderByKey(const std::string& key)
 		return ("");
 }
 
+std::string							Request::getAllRequest()
+{
+	return(_allRequest);
+}
+
+unsigned long						Request::getBodySize()
+{
+	return(_bodySize);
+}
+
+/*-----------SETTERS------------*/
+
 void	Request::setMethod(const std::string& str)
 {
 	_method = str;
@@ -110,6 +131,42 @@ void	Request::setBody(const std::string& str)
 {
 	_body = str;
 }
+
+/*--------MEMBER FUNCTION--------*/
+
+void	Request::parseRequest()
+{
+	std::string request = _allRequest.substr(0, _allRequest.find("\r\n\r\n"));
+	std::vector<std::string> vec = splitInVectorByString(request, "\r\n");
+
+	if (_bodySize != 0)
+		_body = _allRequest.substr(_allRequest.find("\r\n\r\n"), (_allRequest.size() - request.size()));
+	setfirstline(vec[0]);
+	for (unsigned int i = 1 ; i < vec.size() ; i++)
+		setHeader(vec[i]);
+}
+
+void	Request::setfirstline(std::string str)
+{
+	std::vector<std::string> vec = splitInVector(str, ' ');
+	_method = vec[0];
+	_path = vec[1];
+	_version = vec[2];
+}
+
+void	Request::setHeaders(std::string str)
+{
+	std::vector<std::string> vec = split_key_value_by_c(str, ':');
+	
+	if (!vec[0].empty())
+		strTrimedWhiteSpace(vec[0]);
+	if (!vec[1].empty())
+		strTrimedWhiteSpace(vec[1]);
+	_header.insert(std::make_pair(vec[0], vec[1]));
+}
+
+
+/*-------------OSTREAM OPERATOR------------*/
 
 std::ostream& operator<<(std::ostream& os, Request& request)
 {

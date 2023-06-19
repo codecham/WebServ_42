@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/13 00:28:50 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/14 03:19:15 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/19 02:36:08 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,12 @@
 #ifndef REQUEST_HPP
 #define REQUEST_HPP
 
+class Client;
 class Request {
 	
 	public:
 		Request();
-		Request(std::string& str);
+		Request(Client& client);
 		Request(const Request& copy);
 		~Request();
 		Request& operator=(const Request& copy);
@@ -30,6 +31,8 @@ class Request {
 		std::map<std::string, std::string> 	getHeader();
 		std::string 						getBody();
 		std::string							getHeaderByKey(const std::string& key);
+		std::string							getAllRequest();
+		unsigned long						getBodySize();
 
 		/* SETTER */
 		void	setMethod(const std::string& str);
@@ -38,6 +41,9 @@ class Request {
 		void	setHeader(const std::string& str);
 		void	setBody(const std::string& str);
 
+		/* MEMBER FUNCTIONS */
+		void	parseRequest();
+
 	private:
 		/* VARIABLES */
 		std::string 						_method;
@@ -45,6 +51,11 @@ class Request {
 		std::string 						_version;
 		std::map<std::string, std::string> 	_header;
 		std::string 						_body;
+		std::string							_allRequest;
+		unsigned long						_bodySize;
+
+		void	setfirstline(std::string str);
+		void	setHeaders(std::string str);
 };
 
 std::ostream& operator<<(std::ostream& os, Request& request);

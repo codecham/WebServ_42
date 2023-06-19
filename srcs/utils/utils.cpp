@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:48:52 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/14 03:46:53 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/19 02:25:50 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ bool emptyline(std::string& str)
 }
 
 /*
-	Work like ft_split in libft.
+	Works like ft_split in libft.
 	Cut a string on each character c and put the each part in a vector
 */
 
@@ -49,6 +49,29 @@ std::vector<std::string>	splitInVector(std::string& str, char c)
 	split.push_back(str);
 	return(split);
 }
+
+/*
+	Pretty the same than other version but with a string in place of only one char
+	Cut a string on each character c and put the each part in a vector
+*/
+
+std::vector<std::string>	splitInVectorByString(std::string& str, std::string cut)
+{
+	std::vector<std::string> split;
+	int i;
+
+	i = 0;
+	i = str.find(cut);
+	while (i != -1)
+	{
+		split.push_back(str.substr(0, i));
+		str.erase(0, i + cut.size());
+		i = str.find(cut);
+	}
+	split.push_back(str);
+	return(split);
+}
+
 
 /*
 	Take a string and remove all spaces and tabulations at begin and at the end 
@@ -80,6 +103,31 @@ std::vector<std::string> split_key_value(std::string& str)
 
 	strTrimedWhiteSpace(str);
 	first_space_pos = str.find_first_of(" ");
+	if (first_space_pos == std::string::npos)
+	{
+		vec.push_back(str);
+		vec.push_back("");
+	}
+	else
+	{
+		vec.push_back(str.substr(0, first_space_pos));
+		vec.push_back(str.substr(first_space_pos + 1, str.size() - first_space_pos - 1));
+		strTrimedWhiteSpace(vec[1]);
+	}
+	return(vec);
+}
+
+/*
+	Split a combination of KEY VALUE speratate by a char
+*/
+
+std::vector<std::string> split_key_value_by_c(std::string& str, char c)
+{
+	std::vector<std::string> vec;
+	std::size_t first_space_pos;
+
+	strTrimedWhiteSpace(str);
+	first_space_pos = str.find_first_of(c);
 	if (first_space_pos == std::string::npos)
 	{
 		vec.push_back(str);
@@ -134,4 +182,56 @@ bool isDirectory(const std::string& path)
 	if (stat(path.c_str(), &filestat) != 0)
 		return false;
 	return S_ISDIR(filestat.st_mode);
+}
+
+
+/*
+	SIGPIPE is a signal generated when something tries to write to a socket whose read side is closed.
+
+	If this signal is not managed, the program closes.
+
+	So the goal of this function is just to ignore this signal without closing the program
+*/
+
+void sigPipeHandler(int sig)
+{
+	(void)sig;
+}
+
+void signalHandler(int sig)
+{
+	(void)sig;
+}
+
+/*
+	This is just a function who's create a test HTML page
+*/
+
+std::string htmltestpage()
+{
+    std::string response = "HTTP/1.1 200 OK\r\n";
+    response += "Content-Type: text/html\r\n";
+    response += "\r\n";
+    response += "<html><body><h1>Hello from webserv! I'm just a test response</p></body></html>";
+    return response;
+	return(response);
+}
+
+std::string timeOutPage() 
+{
+    std::string response;
+    response += "HTTP/1.1 408 Request Timeout\r\n"
+                "Content-Type: text/html\r\n"
+                "Connection: close\r\n"
+                "\r\n"
+                "<!DOCTYPE html>\n"
+                "<html>\n"
+                "<head>\n"
+                "<title>Error Page</title>\n"
+                "</head>\n"
+                "<body>\n"
+                "<h1>408 Request Time-out</h1>\n"
+                "</body>\n"
+                "</html>";
+    return response;
 }

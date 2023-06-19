@@ -8,6 +8,8 @@ SRCS			=	srcs/main.cpp \
 					srcs/Server/Server.cpp \
 					srcs/Server/Location.cpp \
 					srcs/Request/Request.cpp \
+					srcs/ServerManager/ServerManager.cpp \
+					srcs/Client/Client.cpp \
 
 CC				=	clang++
 

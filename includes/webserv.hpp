@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:35:35 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/14 03:17:49 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/19 02:26:01 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,17 @@
 #define POST 1
 #define DELETE 2
 
+#define MAX_CLIENTS 1024
+#define CONNECTION_TIMEOUT 3 // Time in seconds before client get kicked out if no data was sent.
+
 #include "../srcs/utils/Log.hpp"
 #include "../srcs/ParserConfig/ParserConfig.hpp"
 #include "../srcs/Server/Server.hpp"
 #include "../srcs/Server/Location.hpp"
 #include "../srcs/Request/Request.hpp"
+#include "../srcs/ServerManager/ServerManager.hpp"
+#include "../srcs/Client/Client.hpp"
+
 
 #include <map>
 #include <vector>
@@ -43,6 +49,10 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
+#include <poll.h>
+#include <signal.h>
+
+
 
 /*--------------------------UTILS------------------------------*/
 void strTrimedWhiteSpace(std::string& str);
@@ -52,5 +62,18 @@ std::map<int, std::vector<std::string> > extractFileInMap(std::ifstream& file);
 std::vector<std::string>	splitInVector(std::string& str, char c);
 bool pathToFileExist(const std::string& path);
 bool isDirectory(const std::string& path);
+void sigPipeHandler(int sig);
+std::string htmltestpage();
+std::string timeOutPage();
+void signalHandler(int sig);
+std::vector<std::string>	splitInVectorByString(std::string& str, std::string cut);
+std::vector<std::string> 	split_key_value_by_c(std::string& str, char c);
+
+/*--------------------------UTILS 2------------------------------*/
+
+/*
+	You can add here your functions that you code in the file utils/utils2.cpp :)
+
+*/
 
 #endif

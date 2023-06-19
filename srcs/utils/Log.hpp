@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:27:44 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/14 03:18:55 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/16 19:21:33 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,14 +17,18 @@
 #include <string>
 #include <ctime>
 #include <sys/time.h>
+#include <sys/socket.h>
 #include "../../includes/webserv.hpp"
 
+class Server;
 class Log
 {
 	public:
 		Log(const std::string msg);
 		Log(const std::string level, const std::string msg);
 		Log(const std::string color, const std::string level, const std::string msg);
+		Log(const std::string color, const Server serv, const std::string msg);
+		Log(const std::string color, const Server serv, struct sockaddr_in clientAddress, socklen_t clientAddressLength, const std::string msg);
 		~Log();
 
 	private:

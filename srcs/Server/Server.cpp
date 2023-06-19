@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 13:39:18 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/14 04:05:17 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/19 01:04:50 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,6 +58,7 @@ Server::Server(const Server& copy)
 		_fd = copy._fd;
 		_index = copy._index;
 		_root = copy._root;
+		_fd = copy._fd;
 	}
 }
 
@@ -80,6 +81,7 @@ Server&	Server::operator=(const Server& copy)
 		_fd = copy._fd;
 		_index = copy._index;
 		_root = copy._root;
+		_fd = copy._fd;
 	}
 	return(*this);
 }
@@ -93,7 +95,6 @@ void	Server::setHost(std::string value)
 	std::string address;
 
 	isValidToken(value);
-	Log(GREEN, "PARSING", "SET HOST: " + value);
 	if (value == "localhost")
 		address = "127.0.0.1";
 	else
@@ -106,7 +107,6 @@ void	Server::setHost(std::string value)
 void	Server::setName(std::string value)
 {
 	isValidToken(value);
-	Log(GREEN, "PARSING", "SET NAME: " + value);
 	_name = value;
 }
 
@@ -116,7 +116,6 @@ void	Server::setPort(std::string value)
 	char *endptr;
 
 	isValidToken(value);
-	Log(GREEN, "PARSING", "SET PORT: " + value);
 	tmp = strtol(value.c_str(), &endptr, 10);
 	if (*endptr)
 		throw std::runtime_error("Wrong character in port");
@@ -131,7 +130,6 @@ void	Server::setMaxBodySize(std::string value)
 	char *endptr;
 
 	isValidToken(value);
-	Log(GREEN, "PARSING", "SET MAX_BODY_SIZE: " + value);
 	tmp = strtol(value.c_str(), &endptr, 10);
 	if (*endptr)
 		throw std::runtime_error("Wrong character in MaxBodySize");
@@ -147,7 +145,6 @@ void	Server::setErrorPage(std::string value)
 	char *endptr;
 
 	isValidToken(value);
-	Log(GREEN, "PARSING", "SET ERROR PAGE: " + value);
 	if (value.empty())
 		return ;
 	vec = splitInVector(value, ' ');
@@ -167,21 +164,17 @@ void	Server::setErrorPage(std::string value)
 void	Server::setRoot(std::string value)
 {
 	isValidToken(value);
-	Log(GREEN, "PARSING", "SET ROOT: " + value);
 	_root = value;
 }
 
 void	Server::setIndex(std::string value)
 {
 	isValidToken(value);
-	Log(GREEN, "PARSING", "SET INDEX: " + value);
 	_index = value;
-	std::cout << BLUE << "index = " << _index << std::endl;
 }
 
 void 	Server::setLocation(std::string path, Location location)
 {
-	Log(GREEN, "PARSING", "ADD LOCATION TO SERVER CONFIG: " + path);
 	std::map<std::string, Location>::iterator it = 	_locations.find(path);
 	if (it != _locations.end())
 		throw std::runtime_error("Duplicated Location block found");
@@ -261,6 +254,11 @@ bool							Server::locationExist(std::string path)
 		return (true);
 	else
 		return (false);
+}
+
+int								Server::getfd() const
+{
+	return(_fd);
 }
 
 /*

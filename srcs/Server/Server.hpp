@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 01:26:04 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/14 04:51:47 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/16 18:48:30 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include <stdexcept>
 #include <arpa/inet.h>
 #include <limits>
+ #include <fcntl.h>
 #include "Location.hpp"
 
 /*
@@ -66,6 +67,7 @@ class Server
 		std::string						getIndex() const;
 		std::map<std::string, Location> getLocation() const;
 		Location						getLocationByPath(std::string path);
+		int								getfd() const;
 
 		/*-----------MEMBERS FUNCTIONS------------*/
 

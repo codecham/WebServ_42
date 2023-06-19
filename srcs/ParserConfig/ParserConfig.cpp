@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 00:29:48 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/14 02:58:16 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/16 15:39:19 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,16 +14,17 @@
 
 ParserConfig::ParserConfig(const std::string filename)
 {
-	Log(GREEN, "PARSING", "Open " + filename);
+	Log(BLUE, "PARSING", "Open " + filename);
 	_file.open(filename);
 	if (!_file)
 		throw std::runtime_error("Can't open file");
-	Log(GREEN, "PARSING", "Extract " + filename);
+	Log(BLUE, "PARSING", "Extract " + filename);
 	_extractedFile = extractFileInMap(_file);
 	if (_extractedFile.empty())
 		throw std::runtime_error("Config file is empty");
-	Log(GREEN, "PARSING", "Parsing " + filename);
+	Log(BLUE, "PARSING", "Parsing " + filename);
 	ParseFile();
+	Log(GREEN, "PARSING", "Parsing complete");
 }
 
 ParserConfig::~ParserConfig()
@@ -75,14 +76,12 @@ void	ParserConfig::ParseFile()
 		line = it->second;
 		if (line[0] == "server" && line[1] == "{")
 		{
-			Log(GREEN, "PARSING", "New server block found");
 			it++;
 			line = it->second;
 			while (it != _extractedFile.end() && !isEndBlock(line))
 			{
 				if (line[0] == "location")
 				{
-					Log(GREEN, "PARSING", "New loaction block found");
 					try
 					{
 						location.setPath(line[1]);

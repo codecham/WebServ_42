@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/03 19:30:09 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/14 03:16:39 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/16 15:37:31 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,6 @@ Location&	Location::operator=(const Location& copy)
 
 void	Location::setPath(std::string value)
 {
-	Log(GREEN, "PARSING", "SET LOCATION PATH: " + value);
 	std::vector<std::string> vec = splitInVector(value, ' ');
 	if (vec[1] != "{")
 		throw std::runtime_error("Invalid Location syntax");
@@ -93,7 +92,6 @@ void	Location::setPath(std::string value)
 void	Location::setRoot(std::string value)
 {
 	isValidToken(value);
-	Log(GREEN, "PARSING", "SET LOCATION ROOT: " + value);
 	// if(!(isDirectory(value)))
 	// 	throw std::runtime_error("Root path is not a directory");
 	_root = value;
@@ -102,7 +100,6 @@ void	Location::setRoot(std::string value)
 void	Location::setAutoIndex(std::string value)
 {
 	isValidToken(value);
-	Log(GREEN, "PARSING", "SET LOCATION AUTO INDEX: " + value);
 	if (value != "on" && value != "off")
 		throw std::runtime_error("Wrong auto_index value");
 	if (value == "on")
@@ -114,14 +111,12 @@ void	Location::setAutoIndex(std::string value)
 void	Location::setIndex(std::string value)
 {
 	isValidToken(value);
-	Log(GREEN, "PARSING", "SET LOCATION INDEX: " + value);
 	_index = value;
 }
 
 void	Location::setAllowMethod(std::string value)
 {
 	isValidToken(value);
-	Log(GREEN, "PARSING", "SET LOCATION ALLOWED METHOD: " + value);
 	if (value == "GET")
 		_methods[GET] = true;
 	else if (value == "POST")
@@ -138,7 +133,6 @@ void	Location::setAllowMethod(std::string value)
 void	Location::setDenyMethod(std::string value)
 {
 	isValidToken(value);
-	Log(GREEN, "PARSING", "SET LOCATION DENY METHOD: " + value);
 	if (value == "GET")
 		_methods[GET] = false;
 	else if (value == "POST")
@@ -155,7 +149,6 @@ void	Location::setRedirection(std::string value)
 	std::map<std::string, std::string>::iterator it;
 
 	isValidToken(value);
-	Log(GREEN, "PARSING", "SET LOCATION REDIRECTION: " + value);
 	vec = splitInVector(value, ' ');
 	if (vec.size() != 2)
 		throw std::runtime_error("Invalid number of value for return");
@@ -168,7 +161,6 @@ void	Location::setRedirection(std::string value)
 void	Location::setCgiPath(std::string value)
 {
 	isValidToken(value);
-	Log(GREEN, "PARSING", "SET LOCATION CGI PATH: " + value);
 	isValidPath(value);
 	_cgi_path.push_back(value);
 }
@@ -176,7 +168,6 @@ void	Location::setCgiPath(std::string value)
 void	Location::setCgiExt(std::string value)
 {
 	isValidToken(value);
-	Log(GREEN, "PARSING", "SET LOCATION CGI EXT: " + value);
 	if (value != ".php")
 		throw std::runtime_error("Invalid cgi_ext. Only accepted .php");
 	_cgi_ext.push_back(value);
@@ -188,7 +179,6 @@ void	Location::setClientBodySize(std::string value)
 	char *endptr;
 
 	isValidToken(value);
-	Log(GREEN, "PARSING", "SET LOCATION CLIENT_MAX_BODY_SIZE: " + value);
 	tmp = strtol(value.c_str(), &endptr, 10);
 	if (*endptr)
 		throw std::runtime_error("Wrong character in MaxBodySize");
@@ -204,7 +194,6 @@ void	Location::setErrorPage(std::string value)
 	char *endptr;
 
 	isValidToken(value);
-	Log(GREEN, "PARSING", "SET ERROR PAGE: " + value);
 	if (value.empty())
 		return ;
 	vec = splitInVector(value, ' ');
