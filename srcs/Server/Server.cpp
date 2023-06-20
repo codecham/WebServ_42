@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 13:39:18 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/19 01:04:50 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/20 02:04:58 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ Server::Server()
 	_error_pages[501] = "";
 	_error_pages[502] = "";
 	_error_pages[503] = "";
-	_error_pages[505] = "";
+	_error_pages[504] = "";
 	_error_pages[505] = "";
 	_is_default = false;
 	_listen_fd = 0;

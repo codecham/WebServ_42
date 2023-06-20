@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:35:35 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/19 02:26:01 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/20 01:37:04 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,8 @@ bool emptyline(std::string& str);
 std::vector<std::string> split_key_value(std::string& str);
 std::map<int, std::vector<std::string> > extractFileInMap(std::ifstream& file);
 std::vector<std::string>	splitInVector(std::string& str, char c);
-bool pathToFileExist(const std::string& path);
+bool fileExist(const std::string& path);
+bool readRights(const std::string& path);
 bool isDirectory(const std::string& path);
 void sigPipeHandler(int sig);
 std::string htmltestpage();

@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:48:52 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/19 02:25:50 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/20 01:34:42 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@ bool emptyline(std::string& str)
 		return(true);
 	return(false);
 }
+
 
 /*
 	Works like ft_split in libft.
@@ -49,6 +50,7 @@ std::vector<std::string>	splitInVector(std::string& str, char c)
 	split.push_back(str);
 	return(split);
 }
+
 
 /*
 	Pretty the same than other version but with a string in place of only one char
@@ -117,6 +119,7 @@ std::vector<std::string> split_key_value(std::string& str)
 	return(vec);
 }
 
+
 /*
 	Split a combination of KEY VALUE speratate by a char
 */
@@ -142,8 +145,9 @@ std::vector<std::string> split_key_value_by_c(std::string& str, char c)
 	return(vec);
 }
 
+
 /*
-	Just a function for the parsing
+	Just a function used for the parsing
 */
 
 std::map<int, std::vector<std::string> > extractFileInMap(std::ifstream& file)
@@ -162,14 +166,30 @@ std::map<int, std::vector<std::string> > extractFileInMap(std::ifstream& file)
 	return(map);
 }
 
+
+/*
+	take a file path and return true if the reading right is ok
+*/
+
+bool readRights(const std::string& path) 
+{
+	struct stat filestat;
+	if (stat(path.c_str(), &filestat) != 0)
+		return false;
+	if (filestat.st_mode & S_IRUSR)
+		return(true);
+	return(false);
+}
+
 /*
 	take a file path and return true if it's exist
 */
 
-bool pathToFileExist(const std::string& path) 
+bool fileExist(const std::string& path)
 {
-	std::ifstream file(path.c_str());
-	return (file.is_open());
+	if (access(path.c_str(), F_OK) == 0)
+		return(true);
+	return (false);
 }
 
 /*

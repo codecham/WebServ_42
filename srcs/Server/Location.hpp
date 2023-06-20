@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 19:40:34 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/14 03:19:21 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/19 22:11:31 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,6 +61,7 @@ class Location
 		unsigned long						getClientBodySize() const;
 		bool								getAllowedMethods(std::string method) const;
 		std::map<short, std::string>		getErrorPages() const;
+		std::string 					    getErrorPageCode(short code);
 
 	private:
 		std::string							_path;

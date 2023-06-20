@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:41:29 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/19 03:28:18 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/19 16:09:27 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -551,6 +551,9 @@ void	ServerManager::execRequest(Client& client)
 
 	Log(BLUE, "INFO", "HTTP request received:");
 	std::cout << request << std::endl;
+
+	Log(BLUE, "INFO", "Connected on server: ");
+	std::cout << server << std::endl;
 
 	/*
 	
