@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:41:29 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/19 16:09:27 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/20 17:00:16 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,17 @@ void	ServerManager::checkServers()
 	std::list<Server>::iterator it = _server_list.begin();
 	std::list<Server>::iterator it_next = it;
 	
+	while (it != _server_list.end())
+	{
+		if (it->getHost() <= 0)
+			throw std::runtime_error("host not define or not good for a server");
+		if (it->getPort() <= 0)
+			throw std::runtime_error("Port not define or not good for a server");
+		if (it->getRoot().empty())
+			throw std::runtime_error("Root for server not define. It's mandatory");
+		it++;
+	}
+	it = _server_list.begin();
 	it_next++;
 	while (it != _server_list.end())
 	{
@@ -101,7 +112,6 @@ void	ServerManager::createSockets()
 	{
 		if (checkduplicate(it))
 		{
-			it->setDefault(true);
 			it->createSocket();
 			fcntl(it->getfd(), F_SETFL, O_NONBLOCK);
 			listen(it->getfd(), MAX_CLIENTS);
@@ -551,9 +561,6 @@ void	ServerManager::execRequest(Client& client)
 
 	Log(BLUE, "INFO", "HTTP request received:");
 	std::cout << request << std::endl;
-
-	Log(BLUE, "INFO", "Connected on server: ");
-	std::cout << server << std::endl;
 
 	/*
 	

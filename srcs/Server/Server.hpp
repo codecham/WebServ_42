@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 01:26:04 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/16 18:48:30 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/20 17:00:08 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,10 +50,11 @@ class Server
 		void setPort(std::string value);
 		void setMaxBodySize(std::string value);
 		void setErrorPage(std::string value);
-		void setDefault(bool value);
 		void setRoot(std::string value);
 		void setIndex(std::string value);
 		void setLocation(std::string path, Location location);
+		void setAllowMethod(std::string value);
+		void setDenyMethod(std::string value);
 
 		/*-----------GETTERS------------*/
 		in_addr_t 						getHost() const;
@@ -68,6 +69,7 @@ class Server
 		std::map<std::string, Location> getLocation() const;
 		Location						getLocationByPath(std::string path);
 		int								getfd() const;
+		bool							getAllowedMethods(std::string method) const;
 
 		/*-----------MEMBERS FUNCTIONS------------*/
 
@@ -81,12 +83,11 @@ class Server
 		uint16_t						_port;
 		unsigned int					_max_body_size;
 		std::map<short, std::string>  	_error_pages;
-		bool							_is_default;
 		std::string						_root;
 		std::string						_index;
 		std::map<std::string, Location> _locations;
-		int 							_listen_fd;
 		int								_fd;
+		std::vector<bool>				_methods; // 0 -> GET | 1 -> POST | 2 -> DELETE
 		
 		void isValidToken(std::string& token) const;
 		bool isValidHost(std::string host) const;

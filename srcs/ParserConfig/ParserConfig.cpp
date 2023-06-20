@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 00:29:48 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/16 15:39:19 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/20 17:01:08 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,8 +137,6 @@ void	ParserConfig::ParseFile()
 			}
 			if (it == _extractedFile.end() || !isEndBlock(line))
 				throw std::runtime_error("Wrong Syntax, block not closed");
-			if (_serverlist.size() == 0)
-				server.setDefault(true);
 			_serverlist.push_back(server);
 			server = clean_server;
 			it++;
@@ -187,6 +185,10 @@ void	ParserConfig::insertParamServer(Server& server, std::vector<std::string> to
 		server.setRoot(value);
 	else if (key == "index")
 		server.setIndex(value);
+	else if (key == "allow")
+		server.setAllowMethod(value);
+	else if (key == "deny")
+		server.setDenyMethod(value);
 	else
 		throw std::runtime_error("Invalid line");
 }

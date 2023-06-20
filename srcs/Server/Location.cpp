@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/03 19:30:09 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/20 02:21:13 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/20 16:45:00 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,25 +19,25 @@ Location::Location()
 	_autoindex = "";
 	_index = "";
 	_autoindex = false;
-	_methods.push_back(true);
-	_methods.push_back(true);
-	_methods.push_back(false);
+	_methods.push_back(true); //GET
+	_methods.push_back(false); //POST
+	_methods.push_back(false); //DELETE
 	_max_body_size = 0;
-	_error_pages[301] = "/files/error_pages/301.html";
-	_error_pages[302] = "/files/error_pages/302.html";
-	_error_pages[400] = "/files/error_pages/400.html";
-	_error_pages[401] = "/files/error_pages/401.html";
-	_error_pages[402] = "/files/error_pages/402.html";
-	_error_pages[403] = "/files/error_pages/403.html";
-	_error_pages[404] = "/files/error_pages/404.html";
-	_error_pages[405] = "/files/error_pages/405.html";
-	_error_pages[406] = "/files/error_pages/406.html";
-	_error_pages[500] = "/files/error_pages/500.html";
-	_error_pages[501] = "/files/error_pages/501.html";
-	_error_pages[502] = "/files/error_pages/502.html";
-	_error_pages[503] = "/files/error_pages/503.html";
-	_error_pages[505] = "/files/error_pages/504.html";
-	_error_pages[505] = "/files/error_pages/505.html";
+	_error_pages[301] = "";
+	_error_pages[302] = "";
+	_error_pages[400] = "";
+	_error_pages[401] = "";
+	_error_pages[402] = "";
+	_error_pages[403] = "";
+	_error_pages[404] = "";
+	_error_pages[405] = "";
+	_error_pages[406] = "";
+	_error_pages[500] = "";
+	_error_pages[501] = "";
+	_error_pages[502] = "";
+	_error_pages[503] = "";
+	_error_pages[505] = "";
+	_error_pages[505] = "";
 }
 
 Location::Location(const Location& copy)
@@ -258,11 +258,11 @@ unsigned long						Location::getClientBodySize() const
 bool								Location::getAllowedMethods(std::string method) const
 {
 	if (method == "GET")
-		return(method[GET]);
+		return(_methods[GET]);
 	if (method == "POST")
-		return(method[POST]);
+		return(_methods[POST]);
 	if (method == "DELETE")
-		return(method[DELETE]);
+		return(_methods[DELETE]);
 	return (false);
 }
 

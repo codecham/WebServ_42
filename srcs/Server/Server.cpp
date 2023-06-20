@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 13:39:18 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/20 02:04:58 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/20 17:01:26 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,9 @@ Server::Server()
 	_error_pages[503] = "";
 	_error_pages[504] = "";
 	_error_pages[505] = "";
-	_is_default = false;
-	_listen_fd = 0;
+	_methods.push_back(true); //GET
+	_methods.push_back(false); //POST
+	_methods.push_back(false); //DELETE
 	_fd = 0;
 }
 
@@ -53,12 +54,11 @@ Server::Server(const Server& copy)
 		_name = copy._name;
 		_max_body_size = copy._max_body_size;
 		_error_pages = copy._error_pages;
-		_is_default = copy._is_default;
 		_locations = copy._locations;
 		_fd = copy._fd;
 		_index = copy._index;
 		_root = copy._root;
-		_fd = copy._fd;
+		_methods = copy._methods;
 	}
 }
 
@@ -76,12 +76,11 @@ Server&	Server::operator=(const Server& copy)
 		_name = copy._name;
 		_max_body_size = copy._max_body_size;
 		_error_pages = copy._error_pages;
-		_is_default = copy._is_default;
 		_locations = copy._locations;
 		_fd = copy._fd;
 		_index = copy._index;
 		_root = copy._root;
-		_fd = copy._fd;
+		_methods = copy._methods;
 	}
 	return(*this);
 }
@@ -156,7 +155,7 @@ void	Server::setErrorPage(std::string value)
 	if (tmp < 301 || tmp > 505)
 		throw std::runtime_error("Wrong code error. Must be between 301 and 505");
 	/*
-		need to check if the file exist
+		need to check if the file exist?
 	*/
 	_error_pages.insert(std::make_pair((short)tmp, vec[1]));
 }
@@ -164,6 +163,8 @@ void	Server::setErrorPage(std::string value)
 void	Server::setRoot(std::string value)
 {
 	isValidToken(value);
+	if(!(isDirectory(value)))
+		throw std::runtime_error("Root path is not a directory");
 	_root = value;
 }
 
@@ -181,12 +182,30 @@ void 	Server::setLocation(std::string path, Location location)
 	_locations.insert(std::make_pair(location.getPath(), location));
 }
 
-void	Server::setDefault(bool value)
+void 	Server::setAllowMethod(std::string value)
 {
-	if (value == true)
-		_is_default = true;
+	isValidToken(value);
+	if (value == "GET")
+		_methods[GET] = true;
+	else if (value == "POST")
+		_methods[POST] = true;
+	else if (value == "DELETE")
+		_methods[DELETE] = true;
+	else	throw std::runtime_error("Invalid Allowed Method");
+
+}
+
+void 	Server::setDenyMethod(std::string value)
+{
+	isValidToken(value);
+	if (value == "GET")
+		_methods[GET] = false;
+	else if (value == "POST")
+		_methods[POST] = false;
+	else if (value == "DELETE")
+		_methods[DELETE] = false;
 	else
-		_is_default = false;
+		throw std::runtime_error("Invalid Allowed Method");
 }
 
 /*
@@ -223,11 +242,6 @@ std::string 					Server::getErrorPageCode(short code)
 	return(_error_pages[code]);
 }
 
-bool 							Server::getIsDefault() const
-{
-	return(_is_default);
-}
-
 std::map<std::string, Location> Server::getLocation() const
 {
 	return(_locations);
@@ -259,6 +273,17 @@ bool							Server::locationExist(std::string path)
 int								Server::getfd() const
 {
 	return(_fd);
+}
+
+bool							Server::getAllowedMethods(std::string method) const
+{
+	if (method == "GET")
+		return(_methods[GET]);
+	if (method == "POST")
+		return(_methods[POST]);
+	if (method == "DELETE")
+		return(_methods[DELETE]);
+	return (false);
 }
 
 /*
@@ -345,7 +370,9 @@ std::ostream& operator<<(std::ostream& os, const Server& server)
 	os << "MaxBodySize: " << server.getMaxBodySize() << std::endl;
 	os << "Index: " << server.getIndex() << std::endl;
 	os << "Root: " << server.getRoot() << std::endl;
-	os << "IsDefault: " << server.getIsDefault() << std::endl;
+	os << "GET: " << server.getAllowedMethods("GET") << std::endl;
+	os << "POST: " << server.getAllowedMethods("POST") << std::endl;
+	os << "DELETE: " << server.getAllowedMethods("DELETE") << std::endl;
 	if (!(location.empty()))
 	{
 		while(it != location.end())
