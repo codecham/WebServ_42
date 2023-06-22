@@ -1,0 +1,57 @@
+body {
+	background-image: url("../images/Wallpaper.jpg");
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	height: 100vh; /* Assurez-vous que la hauteur du body remplit la totalité de la fenêtre */
+	margin: 0; /* Supprimez les marges par défaut pour éviter tout débordement */
+}
+.text {
+	color: white;
+	 text-align: center;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+header {
+	/* background-color: #333; */
+	height: 60px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 20px;
+  }
+  
+  nav ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+  }
+  
+  nav ul li {
+	margin-right: 10px;
+  }
+  
+  nav ul li a {
+	color: #fff;
+	text-decoration: none;
+	transform: translate(-50%, -50%);
+	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  .right-nav {
+	margin-left: auto;
+  }
+
+  .logo {
+	width: 50px;
+	height: 50px;
+  }
+
+  .logo img:hover {
+	transform: scale(1.1);
+  }

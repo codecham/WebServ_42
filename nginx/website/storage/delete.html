@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<meta charset="utf-8">
+		<title>WebServ</title>
+		<link rel="stylesheet" href="../styles/styles_upload.css">
+	</head>
+	<body>
+		<header>
+			<div class="logo">
+				<a href="../index.html"><img class="logo" src="../images/logos/42.png" alt="42_logo" title="home"/></a>
+			</div>
+			</header>
+			<div>
+				<h1>Delete file</h1>
+				<form id="delete-form">
+				  <label for="file-selector">Select file to delete:</label>
+				  <input type="file" id="file-selector" name="file">
+				  <button type="submit">Delete</button>
+				</form>
+			</div>
+			<div id="errorContainer"></div>
+			<script>
+			let errorContainer = document.getElementById('errorContainer');
+			var additionnaltext;
+			  const deleteForm = document.querySelector('#delete-form');
+			  deleteForm.addEventListener('submit', function(event) {
+				event.preventDefault();
+				const file = document.querySelector('#file-selector').files[0];
+				const fileUrl = 'http://localhost:4242/storage/' + file.name;
+				const requestOptions = {
+				  method: 'DELETE'
+				};
+				fetch(fileUrl, requestOptions)
+				  .then(response => {
+					if (response.ok) {
+					  console.log('File deleted successfully');
+					  var additionnaltext = "File deleted successfully";
+					  errorContainer.innerHTML = additionnaltext;
+					} else {
+					  console.error('Failed to delete file:', response.statusText);
+					  var additionnaltext = "Failed to delete file: " + response.statusText;
+					  errorContainer.innerHTML = additionnaltext;
+					}
+				  })
+				  .catch(error => console.error('Error:', error));
+			  });
+			</script>
+	</body>
+</html>

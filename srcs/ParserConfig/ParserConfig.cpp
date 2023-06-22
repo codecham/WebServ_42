@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 00:29:48 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/20 17:01:08 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/22 20:33:22 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -222,6 +222,8 @@ void	ParserConfig::insertParamLocation(Location& location, std::vector<std::stri
 		location.setRedirection(value);
 	else if (key == "error_page")
 		location.setErrorPage(value);
+	else if (key == "upload_store")
+		location.setUploadStore(value);
 	else
 		throw std::runtime_error("Invalid line");
 }

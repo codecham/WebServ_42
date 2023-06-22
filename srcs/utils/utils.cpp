@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:48:52 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/20 01:34:42 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/20 19:46:30 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -232,7 +232,7 @@ std::string htmltestpage()
     std::string response = "HTTP/1.1 200 OK\r\n";
     response += "Content-Type: text/html\r\n";
     response += "\r\n";
-    response += "<html><body><h1>Hello from webserv! I'm just a test response</p></body></html>";
+    response += "<html><head>\n<link rel=\"stylesheet\" type=\"text/css\" href=\"styles.css\">\n</head><body><h1>Hello from webserv! I'm just a test response</p></body></html>";
     return response;
 	return(response);
 }

@@ -1,0 +1,37 @@
+If you want to do some test with NGINX!
+---------------------------------------
+
+1: Install nginx with this command:
+
+brew install nginx
+---------------------------------------
+
+
+2: Prepare directory for testing:
+
+- Create the directory --> /var/www/website/
+
+- Create the directory --> /var/log/www/website
+
+----------------------------------------
+
+3: Now use make:
+
+make update: copy the website content to the /var/log/www/website. 
+--> Do it the first time you run and each time you modify the website content
+
+make: run nginx
+
+make stop: stop nginx
+
+make re: reload nginx
+
+-----------------------------------------
+
+Now use browser to go to localhost:4242 for testing the website
+
+Note:
+
+- POST and DELETE method in the website work only on the localhost:4242
+
+- When you testing our code, make stop for free the port 4242 from nginx

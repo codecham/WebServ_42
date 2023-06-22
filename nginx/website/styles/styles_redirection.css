@@ -1,0 +1,66 @@
+body {
+	background-image: url("../images/Blue.jpg");
+	background-size: cover;
+	background-position: center;
+	background-repeat: no-repeat;
+	height: 100vh; /* Assurez-vous que la hauteur du body remplit la totalité de la fenêtre */
+	margin: 0; /* Supprimez les marges par défaut pour éviter tout débordement */
+}
+  
+  .container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
+  }
+  
+  .person {
+	text-align: center;
+	margin: 20px;
+  }
+  
+  .person img {
+	width: 200px;
+	height: 200px;
+	border-radius: 50%;
+  }
+  
+  .person h2 {
+	color: white;
+	font-size: 30px;
+	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  .person p {
+	color: white;
+	font-size: 16px;
+  }
+  
+  .logo {
+	width: 50px;
+	height: 50px;
+	filter: drop-shadow(0 0 5px white); /* Ajoute un effet d'ombre blanche autour du logo */
+  }  
+
+  header {
+	/* background-color: #333; */
+	height: 60px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 0 20px;
+  }
+
+  .person img:hover {
+	transform: scale(1.1);
+  }
+  
+  .logo img:hover {
+	transform: scale(1.1);
+  }
+  
+  h2 {
+	color: white;
+	font-size: 30px;
+	text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  }

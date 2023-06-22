@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/03 19:30:09 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/20 16:45:00 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/22 20:32:44 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -210,6 +210,12 @@ void	Location::setErrorPage(std::string value)
 	_error_pages[tmp] = vec[1];
 }
 
+void 	Location::setUploadStore(std::string value)
+{
+	isValidToken(value);
+	_upload_store = value;
+}
+
 std::string 						Location::getPath() const
 {
 	return (_path);
@@ -266,6 +272,11 @@ bool								Location::getAllowedMethods(std::string method) const
 	return (false);
 }
 
+std::string		Location::getUploadStore() const
+{
+	return(_upload_store);
+}
+
 std::map<short, std::string>		Location::getErrorPages() const
 {
 	return(_error_pages);
@@ -320,6 +331,7 @@ std::ostream& operator<<(std::ostream& os, const Location& location)
 	os << "GET: " << location.getAllowedMethods("GET") << std::endl;
 	os << "POST: " << location.getAllowedMethods("POST") << std::endl;
 	os << "DELETE: " << location.getAllowedMethods("DELETE") << std::endl;
+	os << "upload_store: " << location.getUploadStore() << std::endl;
 	if (!(redirection.empty()))
 	{
 		os << "redirection: " << std::endl;
