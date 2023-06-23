@@ -102,9 +102,9 @@ body {
   }
   
   .snake {
-	width: 20px;
-	height: 20px;
+	width: 12px;
+	height: 12px;
 	position: absolute;
-	top: 100px;
+	top: 102px;
 	left: 1100px;
   }
