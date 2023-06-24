@@ -6,13 +6,11 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:41:00 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/19 03:08:39 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/23 02:34:25 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/webserv.hpp"
-
-
 
 int main(int argc, char **argv)
 {

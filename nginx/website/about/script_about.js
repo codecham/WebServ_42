@@ -28,3 +28,49 @@ personImages.forEach(function(img) {
     });
 });
 });
+
+window.addEventListener('load', function() {
+    var overlayImage = document.querySelector('.overlay-image');
+    var gifImage = document.querySelector('#fullscreen-gif img');
+  
+    // Obtenir les dimensions du GIF
+    var gifWidth = gifImage.clientWidth;
+    var gifHeight = gifImage.clientHeight;
+  
+    // Ajuster la position de l'image en fonction des dimensions du GIF
+    var offsetX = 552; // Ajustez la valeur selon vos besoins
+    var offsetY = -103; // Ajustez la valeur selon vos besoins
+  
+    overlayImage.style.left = (offsetX + gifWidth / 2) + 'px';
+    overlayImage.style.top = (offsetY + gifHeight / 2) + 'px';
+  });
+  
+  // Attendre que la page soit entièrement chargée
+window.addEventListener('load', function() {
+    // Sélectionner la div contenant le GIF
+    var fullscreenDiv = document.getElementById('fullscreen-gif');
+  
+    // Ajouter une classe spéciale pour l'animation plein écran
+    fullscreenDiv.classList.add('fullscreen');
+  
+    // Supprimer la classe après une durée donnée (par exemple, 3 secondes)
+    setTimeout(function() {
+      fullscreenDiv.classList.remove('fullscreen');
+    }, 2800); // Durée en millisecondes (3 secondes dans cet exemple)
+  });
+
+  window.addEventListener('load', function() {
+    var fullscreenDiv = document.getElementById('fullscreen-gif');
+  
+    setTimeout(function() {
+      fullscreenDiv.parentNode.removeChild(fullscreenDiv);
+    }, 2800);
+  });
+
+  window.addEventListener('load', function() {
+    var overlayImage = document.querySelector('.overlay-image');
+  
+    // Ajuster l'opacité progressivement de 0 à 1
+    overlayImage.style.opacity = '1';
+  });
+  
