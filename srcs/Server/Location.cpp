@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/03 19:30:09 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/22 20:32:44 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/27 04:52:43 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,8 @@
 
 Location::Location()
 {
+	std::string error_directory = DEFAULT_ERROR_PAGE_DIRECTORY;
+
 	_path = "";
 	_root = "";
 	_autoindex = "";
@@ -23,21 +25,21 @@ Location::Location()
 	_methods.push_back(false); //POST
 	_methods.push_back(false); //DELETE
 	_max_body_size = 0;
-	_error_pages[301] = "";
-	_error_pages[302] = "";
-	_error_pages[400] = "";
-	_error_pages[401] = "";
-	_error_pages[402] = "";
-	_error_pages[403] = "";
-	_error_pages[404] = "";
-	_error_pages[405] = "";
-	_error_pages[406] = "";
-	_error_pages[500] = "";
-	_error_pages[501] = "";
-	_error_pages[502] = "";
-	_error_pages[503] = "";
-	_error_pages[505] = "";
-	_error_pages[505] = "";
+	_error_pages[301] = error_directory + "301.html";
+	_error_pages[302] = error_directory + "302.html";
+	_error_pages[400] = error_directory + "400.html";
+	_error_pages[401] = error_directory + "401.html";
+	_error_pages[402] = error_directory + "402.html";
+	_error_pages[403] = error_directory + "403.html";
+	_error_pages[404] = error_directory + "404.html";
+	_error_pages[405] = error_directory + "405.html";
+	_error_pages[406] = error_directory + "406.html";
+	_error_pages[500] = error_directory + "500.html";
+	_error_pages[501] = error_directory + "501.html";
+	_error_pages[502] = error_directory + "502.html";
+	_error_pages[503] = error_directory + "503.html";
+	_error_pages[504] = error_directory + "504.html";
+	_error_pages[505] = error_directory + "505.html";
 }
 
 Location::Location(const Location& copy)
@@ -241,9 +243,14 @@ std::vector<bool> 					Location::getMethods() const
 	return (_methods);
 }
 
-std::map<std::string, std::string> 	Location::getRedirection() const
+std::map<std::string, std::string> 	Location::getRedirectionMap() const
 {
 	return (_redirection);
+}
+
+std::string  						Location::getRedirection(std::string str)
+{
+	return(_redirection[str]);
 }
 
 std::vector<std::string> 			Location::getCgiPath() const
@@ -314,9 +321,17 @@ void	Location::isValidPath(std::string& str)
 	}
 }
 
+bool 	Location::redirectionExist(std::string path)
+{
+	if (_redirection.find(path) != _redirection.end())
+		return(true);
+	else
+		return(false);
+}
+
 std::ostream& operator<<(std::ostream& os, const Location& location)
 {
-	std::map<std::string, std::string>	redirection = location.getRedirection();
+	std::map<std::string, std::string>	redirection = location.getRedirectionMap();
 	std::map<short, std::string>  		error_pages = location.getErrorPages(); 
 	std::map<std::string, std::string>::iterator it = redirection.begin();
 	std::map<short, std::string>::iterator it_errpage = error_pages.begin();

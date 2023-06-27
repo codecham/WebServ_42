@@ -10,6 +10,8 @@ SRCS			=	srcs/main.cpp \
 					srcs/Request/Request.cpp \
 					srcs/ServerManager/ServerManager.cpp \
 					srcs/Client/Client.cpp \
+					srcs/Response/Response.cpp \
+					srcs/testExec.cpp \
 
 CC				=	clang++
 

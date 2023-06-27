@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 19:40:34 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/22 20:29:27 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/27 04:48:30 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,8 @@ class Location
 		bool								getAutoIndex() const;
 		std::string							getIndex() const;
 		std::vector<bool> 					getMethods() const;
-		std::map<std::string, std::string> 	getRedirection() const;
+		std::string  						getRedirection(std::string str);
+		std::map<std::string, std::string> 	getRedirectionMap() const;
 		std::vector<std::string> 			getCgiPath() const;
 		std::vector<std::string> 			getCgiExt() const;
 		unsigned long						getClientBodySize() const;
@@ -64,6 +65,8 @@ class Location
 		std::map<short, std::string>		getErrorPages() const;
 		std::string 					    getErrorPageCode(short code);
 		std::string 						getUploadStore() const;
+		
+		bool 								redirectionExist(std::string path);
 
 	private:
 		std::string							_path;

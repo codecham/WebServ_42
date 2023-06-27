@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:41:29 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/20 17:00:16 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/27 05:02:56 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -558,6 +558,7 @@ void	ServerManager::execRequest(Client& client)
 {
 	Request request = client.getRequest();
 	Server server = getServerForRequest(client);
+	Response response;
 
 	Log(BLUE, "INFO", "HTTP request received:");
 	std::cout << request << std::endl;
@@ -577,10 +578,12 @@ void	ServerManager::execRequest(Client& client)
 
 
 		For the moment, with the code bellow, that just send a little HTTP response define in /utils/utils.cpp.
-		When you want to test you can replace "htmltestpage" with your result for sending to the client 
-
+		
+		When you want to test with your code you can't Uncomment the 2 lines bellow and comment the second line "send(...)"
 	*/
 
+	//Exec(server, request, response);
+	// send(client.getSockfd(), response.getResponse().c_str(), response.getResponse().size() + 1, 0);
 	send(client.getSockfd(), htmltestpage().c_str(), htmltestpage().size(), 0);
 	client.setInactive();
 }

@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:35:35 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/20 01:37:04 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/27 04:22:44 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@
 
 #define MAX_CLIENTS 1024
 #define CONNECTION_TIMEOUT 3 // Time in seconds before client get kicked out if no data was sent.
+#define DEFAULT_ERROR_PAGE_DIRECTORY "files/errors_pages/"
 
 #include "../srcs/utils/Log.hpp"
 #include "../srcs/ParserConfig/ParserConfig.hpp"
@@ -36,8 +37,9 @@
 #include "../srcs/Request/Request.hpp"
 #include "../srcs/ServerManager/ServerManager.hpp"
 #include "../srcs/Client/Client.hpp"
+#include "../srcs/Response/Response.hpp"
 
-
+#include <sstream>
 #include <map>
 #include <vector>
 #include <sys/types.h>
@@ -52,8 +54,7 @@
 #include <poll.h>
 #include <signal.h>
 
-
-
+class Response;
 /*--------------------------UTILS------------------------------*/
 void strTrimedWhiteSpace(std::string& str);
 bool emptyline(std::string& str);
@@ -69,6 +70,11 @@ std::string timeOutPage();
 void signalHandler(int sig);
 std::vector<std::string>	splitInVectorByString(std::string& str, std::string cut);
 std::vector<std::string> 	split_key_value_by_c(std::string& str, char c);
+std::string 				extractFileToString(std::string file_name);
+std::string 				extractFileBinary(std::string file_name);
+void						testExec(Server& server, Request& request, Response& response);
+std::string extractFileBase64(const std::string& file_name);
+std::string base64Encode(const std::string& input);
 
 /*--------------------------UTILS 2------------------------------*/
 
