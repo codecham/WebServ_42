@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:18:07 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/19 03:28:00 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/30 20:07:39 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,6 @@ class ServerManager
 
 		void	closeServers();
 		void	printServfds();
-		void	stopServ();
 
 	private:
 		std::list<Server> 					_server_list;
@@ -58,6 +57,7 @@ class ServerManager
 		void	checkRequest(int fd);
 		Server  getServerForRequest(Client& client);
 		void	execRequest(Client& client);
+		void 	writeToClient(int client_fd, const std::string &str);
 };
 
 #endif

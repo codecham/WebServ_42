@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/13 00:53:15 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/19 02:31:19 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/30 03:31:49 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,18 +170,18 @@ void	Request::setHeaders(std::string str)
 
 std::ostream& operator<<(std::ostream& os, Request& request)
 {
-	std::map<std::string, std::string> header = request.getHeader();
-	std::map<std::string, std::string>::iterator it = header.begin();
+	// std::map<std::string, std::string> header = request.getHeader();
+	// std::map<std::string, std::string>::iterator it = header.begin();
 
 	os << request.getMethod() << " ";
 	os << request.getPath() << " ";
 	os << request.getVersion() << std::endl;
-	while (it != header.end())
-	{
-		os << it->first << ": " << it->second << std::endl;
-		it++;
-	}
-	os << "\n";
-	os << request.getBody() << std::endl;
+	// while (it != header.end())
+	// {
+	// 	os << it->first << ": " << it->second << std::endl;
+	// 	it++;
+	// }
+	// os << "\n";
+	// os << request.getBody() << std::endl;
 	return(os);
 }

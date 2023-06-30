@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:48:52 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/27 02:24:47 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/30 20:04:34 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -255,92 +255,4 @@ std::string timeOutPage()
                 "</body>\n"
                 "</html>";
     return response;
-}
-
-std::string extractFileToString(std::string file_name)
-{
-	std::ifstream 	file;
-	std::string		line;
-	std::string		content;
-
-	file.open(file_name);
-	while(std::getline(file, line))
-		content += line + "\n";
-	return(content);
-}
-
-std::string extractFileBinary(std::string file_name)
-{
-    std::ifstream file(file_name.c_str(), std::ios::binary);
-    if (!file)
-    {
-        std::cerr << "Erreur lors de l'ouverture du fichier." << std::endl;
-        return "";
-    }
-
-    // Obtenir la taille du fichier
-    file.seekg(0, std::ios::end);
-    std::streampos file_size = file.tellg();
-    file.seekg(0, std::ios::beg);
-
-    // Lire le fichier en binaire
-    std::vector<char> buffer(file_size);
-    file.read(&buffer[0], file_size);
-
-    // Construire la chaîne de caractères à partir des données binaires
-    std::string binary_string(buffer.begin(), buffer.end());
-
-    return binary_string;
-}
-
-std::string extractFileBase64(const std::string& file_name)
-{
-    std::ifstream file(file_name.c_str(), std::ios::binary);
-    if (!file)
-    {
-        std::cerr << "Erreur lors de l'ouverture du fichier." << std::endl;
-        return "";
-    }
-
-    std::ostringstream binary_buffer;
-    binary_buffer << file.rdbuf();
-
-    std::string binary_data = binary_buffer.str();
-    std::string base64_data = base64Encode(binary_data);
-
-    return base64_data;
-}
-
-std::string base64Encode(const std::string& input)
-{
-    static const std::string base64_chars =
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz"
-        "0123456789+/";
-
-    std::string output;
-    int val = 0;
-    int valb = -6;
-    size_t len = input.length();
-    unsigned char c;
-
-    for (size_t i = 0; i < len; i++)
-    {
-        c = input[i];
-        val = (val << 8) + c;
-        valb += 8;
-        while (valb >= 0)
-        {
-            output.push_back(base64_chars[(val >> valb) & 0x3F]);
-            valb -= 6;
-        }
-    }
-
-    if (valb > -6)
-        output.push_back(base64_chars[((val << 8) >> (valb + 8)) & 0x3F]);
-
-    while (output.size() % 4 != 0)
-        output.push_back('=');
-
-    return output;
 }

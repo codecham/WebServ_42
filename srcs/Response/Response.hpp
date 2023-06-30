@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 18:35:06 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/27 00:03:48 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/30 18:16:55 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ class Response
 		void setMessage(const std::string str);
 		void setHeader(const std::string key, const std::string value);
 		void setBody(const std::string str);
-		void setPage(const std::string file);
+		void setPage(const std::string& file);
 
 		/*------------GETTER-----------*/
 		std::string getVersion() const;
@@ -41,9 +41,10 @@ class Response
 		std::string getHeaderByKey(std::string key);
 		std::string getBody() const;
 		std::string getResponse() const;
+		std::string getResponseNoBody();
 
 		void 		buildResponse();
-		void		createResponse(std::string code, std::string file);
+		void		createResponse(const std::string& code, const std::string& file);
 
 	private:
 		std::string	_version;
@@ -54,9 +55,11 @@ class Response
 		std::string _response;
 		std::map<std::string, std::string> _mimeTypes;
 
-		void	insert_mimes_types(std::string key, std::string value);
-		void	create_mimes_types();
+		void		insert_mimes_types(std::string key, std::string value);
+		void		create_mimes_types();
 		std::string createline(std::string line);
+		void		addFileToBody(const std::string& fileName);
+		void		setMimeType(const std::string& fileName);
 };
 
 std::ostream& operator<<(std::ostream& os, const Response& response);

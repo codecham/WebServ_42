@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 18:51:08 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/27 04:24:31 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/30 20:06:06 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,7 @@
 Response::Response()
 {
 	_version = "HTTP/1.1";
-	_header.insert(std::make_pair("Content-Length", "0"));
-	_header.insert(std::make_pair("Connexion", "close"));
+	_header.insert(std::make_pair("Connexion", "keep-alive"));
 	create_mimes_types();
 	
 }
@@ -87,27 +86,10 @@ void	Response::setBody(const std::string str)
 	_header["Content-Length"] = std::to_string(str.size());
 }
 
-void	Response::setPage(const std::string file)
+void	Response::setPage(const std::string& file)
 {
-	std::map<std::string, std::string>::iterator it;
-	std::string ext;
-	unsigned int pos = file.find_last_of(".");
-
-	ext = file.substr(pos, file.size());
-	it = _mimeTypes.find(ext);
-	if (ext == ".html" || ext == ".htm" || ext == ".css" || ext == ".js")
-		_body = extractFileToString(file);
-	else if (ext == ".png" || ext == ".jpg" || ext == ".jpeg" || ext == ".gif")
-        _body = "data:image/" + ext.substr(1) + ";base64," + extractFileBase64(file);
-	else
-		_body = extractFileBinary(file);
-	_header["Content-Length"] = std::to_string(_body.size() + 1);
-	if (it != _mimeTypes.end())
-		_header.insert(std::make_pair("Content-Type", it->second));
-	else
-		_header.insert(std::make_pair("Content-Type", "application/octet-stream"));
+	addFileToBody(file);
 }
-
 
 /*
 	--------------------GETTERS----------------------	
@@ -153,6 +135,21 @@ std::string Response::getResponse() const
 	return(_response);
 }
 
+std::string Response::getResponseNoBody()
+{
+	std::map<std::string, std::string>::iterator it = _header.begin();
+	std::string response = _version + " " + _code + " " +_message + "\n";
+
+	while(it != _header.end())
+	{
+		response += it->first + ": " + it->second + "\n";
+		it++;
+	}
+	return(response);
+}
+
+
+
 /*
 	--------------MEMBER FUNCTIONS-------------------
 */
@@ -167,7 +164,7 @@ void	Response::buildResponse()
 		_response += createline(it->first + ": " + it->second);
 		it++;
 	}
-	_response += createline("\r\n");
+	_response += ("\r\n");
 	if (!_body.empty())
 		_response += _body;
 }
@@ -249,12 +246,51 @@ void	Response::create_mimes_types()
 	insert_mimes_types(".7z", "application/x-7z-compressed");
 }
 
-void		Response::createResponse(std::string code, std::string file)
+void		Response::createResponse(const std::string& code, const std::string& file)
 {
 	setCode(code);
 	if (!file.empty())
 		setPage(file);
 	buildResponse();
+}
+
+void		Response::addFileToBody(const std::string& fileName)
+{
+	std::ostringstream body;
+	std::streampos fileSize;
+
+	std::ifstream file(fileName.c_str(), std::ios::binary);
+
+	if (!file)
+		return;
+	file.seekg(0, std::ios::end);
+	fileSize = file.tellg();
+	file.seekg(0, std::ios::beg);
+
+	std::vector<char> fileContent(fileSize);
+	file.read(&fileContent[0], fileSize);
+
+	file.close();
+
+	_header.insert(std::make_pair("Content-Length", std::to_string(fileSize)));
+	setMimeType(fileName);
+	body.write(&fileContent[0], fileSize);
+	_body = body.str();
+}
+
+
+void		Response::setMimeType(const std::string& fileName)
+{
+	std::map<std::string, std::string>::iterator it;
+	std::string ext;
+	unsigned int pos = fileName.find_last_of(".");
+
+	ext = fileName.substr(pos);
+	it = _mimeTypes.find(ext);
+	if (it != _header.end())
+		_header.insert(std::make_pair("Content-Type", it->second));
+	else
+		_header.insert(std::make_pair("Content-Type", "application/octet-stream"));
 }
 
 /*------------------------------------------------*/
@@ -264,4 +300,3 @@ std::ostream& operator<<(std::ostream& os, const Response& response)
 	os << response.getResponse() << std::endl; 
 	return(os);
 }
-

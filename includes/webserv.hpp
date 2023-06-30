@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:35:35 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/27 04:22:44 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/30 19:44:57 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,23 @@
 #define MAGENTA "\033[1;35m"
 #define CYAN    "\033[1;36m"
 #define GREY    "\033[38;5;8m"
+#define BRIGHT_BLACK "\033[30;1m"
+#define BRIGHT_RED   "\033[31;1m"
+#define BRIGHT_GREEN "\033[32;1m"
+#define BRIGHT_YELLOW "\033[33;1m"
+#define BRIGHT_BLUE  "\033[34;1m"
+#define BRIGHT_MAGENTA "\033[35;1m"
+#define BRIGHT_CYAN  "\033[36;1m"
+#define BRIGHT_WHITE "\033[37;1m"
+#define ORANGE       "\033[38;5;208m"
+#define PINK         "\033[38;5;205m"
+#define PURPLE       "\033[38;5;135m"
+#define LIME         "\033[38;5;118m"
+#define TEAL         "\033[38;5;30m"
+#define BROWN        "\033[38;5;130m"
+#define SILVER       "\033[38;5;7m"
+#define GOLD         "\033[38;5;220m"
+#define GRAY         "\033[38;5;8m"
 
 #define GET 0
 #define POST 1
@@ -73,8 +90,8 @@ std::vector<std::string> 	split_key_value_by_c(std::string& str, char c);
 std::string 				extractFileToString(std::string file_name);
 std::string 				extractFileBinary(std::string file_name);
 void						testExec(Server& server, Request& request, Response& response);
-std::string extractFileBase64(const std::string& file_name);
-std::string base64Encode(const std::string& input);
+std::string 				createHTTPResponseWithImage(const std::string& imageFileName);
+void writeToLogFile(const std::string& text);
 
 /*--------------------------UTILS 2------------------------------*/
 

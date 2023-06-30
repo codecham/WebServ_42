@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:41:29 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/27 05:02:56 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/06/30 20:11:57 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -300,8 +300,8 @@ void	ServerManager::addClientPoll(struct pollfd *poll_fds, Client& client)
 		return ;
 	}
 	_clients_list.push_back(client);
-	Log(GREEN, "INFO", "New client accepted: ");
-	std::cout << client << std::endl;
+	Log(GREEN, "INFO", "New client accepted");
+	// std::cout << client << std::endl;
 }
 
 
@@ -334,7 +334,7 @@ void	ServerManager::checkpollClient(struct pollfd *poll_fds)
 		i++;
 	while (i < MAX_CLIENTS + _serv_fds.size())
 	{
-		if (poll_fds[i].revents & (POLLIN | POLL_HUP))
+		if (poll_fds[i].revents & (POLLIN | POLLHUP))
 		{
 			char buffer[8192];
 			int bytesRead = recv(poll_fds[i].fd, buffer, sizeof(buffer), 0);
@@ -449,7 +449,7 @@ void	ServerManager::clearClients(struct pollfd *poll_fds)
 			{
 				eraseClientsListByfd(poll_fds[i].fd);
 				close(poll_fds[i].fd);
-				Log(YELLOW, "INFO", "Connexion close for client on the socket " + std::to_string(poll_fds[i].fd));
+				// Log(YELLOW, "INFO", "Connexion close for client on the socket " + std::to_string(poll_fds[i].fd));
 				poll_fds[i].fd = 0;
 			}
 		}
@@ -549,6 +549,16 @@ void	ServerManager::printServfds()
 	}
 }
 
+void ServerManager::writeToClient(int client_fd, const std::string &str) {
+	const ssize_t nbytes = send(client_fd, str.c_str(), str.length(), 0);
+	if (nbytes == -1)
+	{
+		Log(RED, "INFO", "Failed to send");
+	}
+	else if ((size_t) nbytes < str.length()) {
+		writeToClient(client_fd, str.substr(nbytes));
+	}
+}
 
 
 
@@ -582,8 +592,13 @@ void	ServerManager::execRequest(Client& client)
 		When you want to test with your code you can't Uncomment the 2 lines bellow and comment the second line "send(...)"
 	*/
 
-	//Exec(server, request, response);
-	// send(client.getSockfd(), response.getResponse().c_str(), response.getResponse().size() + 1, 0);
-	send(client.getSockfd(), htmltestpage().c_str(), htmltestpage().size(), 0);
+	// Exec(server, request, response);
+	std::string resp ;
+
+	testExec(server, request, response);
+	resp = response.getResponse();
+	Log(MAGENTA, "INFO", "Response:\n" + response.getResponseNoBody());
+	writeToClient(client.getSockfd(), response.getResponse());
+	std::cout << CYAN << "---------------------------------------------\n" << RESET << std::endl;
 	client.setInactive();
 }
