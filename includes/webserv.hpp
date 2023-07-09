@@ -95,9 +95,12 @@ void writeToLogFile(const std::string& text);
 
 /*--------------------------UTILS 2------------------------------*/
 
-/*
-	You can add here your functions that you code in the file utils/utils2.cpp :)
-
-*/
+template <typename T>
+std::string to_string(T value)
+{
+	std::ostringstream os;
+	os << value;
+	return (os.str());
+}
 
 #endif
