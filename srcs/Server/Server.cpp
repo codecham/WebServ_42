@@ -323,7 +323,7 @@ void 	Server::createSocket()
 	memset(&hints, 0, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
-	ret = getaddrinfo(inet_ntoa(addr), std::to_string(_port).c_str(), &hints, &result);
+	ret = getaddrinfo(inet_ntoa(addr), to_string(_port).c_str(), &hints, &result);
 	if (ret != 0)
 		throw std::runtime_error(gai_strerror(ret));
 	tmp = result;
@@ -340,11 +340,11 @@ void 	Server::createSocket()
 	}
 	freeaddrinfo(result);
 	if (tmp == NULL)
-		throw std::runtime_error("Can't socket or bind host " + ip + ":" + std::to_string(_port));
+		throw std::runtime_error("Can't socket or bind host " + ip + ":" + to_string(_port));
 	if (!_name.empty())
-		Log(GREEN, "SERVER", "Socket for " + _name + " on " + ip + ":" + std::to_string(_port) + " successfully created");
+		Log(GREEN, "SERVER", "Socket for " + _name + " on " + ip + ":" + to_string(_port) + " successfully created");
 	else
-		Log(GREEN, "SERVER", "Socket for " + ip + ":" + std::to_string(_port) + " successfully created");
+		Log(GREEN, "SERVER", "Socket for " + ip + ":" + to_string(_port) + " successfully created");
 }
 
 void	Server::closeSocket()

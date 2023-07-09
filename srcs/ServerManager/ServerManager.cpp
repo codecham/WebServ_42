@@ -420,7 +420,7 @@ void	ServerManager::checkClientsTimeOut()
 	{
 		if (time(NULL) - _clients_list[i].getLastTime() > CONNECTION_TIMEOUT)
 		{
-			Log(YELLOW, "INFO", "Client on connected to fd " + std::to_string(_clients_list[i].getSockfd()) + " Timeout. Connection will be closed.");
+			Log(YELLOW, "INFO", "Client on connected to fd " + to_string(_clients_list[i].getSockfd()) + " Timeout. Connection will be closed.");
 			send(_clients_list[i].getSockfd(), timeOutPage().c_str(), timeOutPage().size(), 0);
 			_clients_list[i].setInactive();
 		}

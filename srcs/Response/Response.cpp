@@ -83,7 +83,7 @@ void	Response::setHeader(const std::string key, const std::string value)
 void	Response::setBody(const std::string str)
 {
 	_body = str;
-	_header["Content-Length"] = std::to_string(str.size());
+	_header["Content-Length"] = to_string(str.size());
 }
 
 void	Response::setPage(const std::string& file)
@@ -272,7 +272,7 @@ void		Response::addFileToBody(const std::string& fileName)
 
 	file.close();
 
-	_header.insert(std::make_pair("Content-Length", std::to_string(fileSize)));
+	_header.insert(std::make_pair("Content-Length", to_string(fileSize)));
 	setMimeType(fileName);
 	body.write(&fileContent[0], fileSize);
 	_body = body.str();

@@ -15,7 +15,7 @@
 ParserConfig::ParserConfig(const std::string filename)
 {
 	Log(BLUE, "PARSING", "Open " + filename);
-	_file.open(filename);
+	_file.open(filename.c_str());
 	if (!_file)
 		throw std::runtime_error("Can't open file");
 	Log(BLUE, "PARSING", "Extract " + filename);
@@ -89,7 +89,7 @@ void	ParserConfig::ParseFile()
 					catch(const std::exception& e) 
 					{
 						error = e.what();
-						throw std::runtime_error(error + " on line " + std::to_string(it->first));
+						throw std::runtime_error(error + " on line " + to_string(it->first));
 					}
 					it++;
 					line = it->second;
@@ -102,13 +102,13 @@ void	ParserConfig::ParseFile()
 						catch(const std::exception& e) 
 						{
 							error = e.what();
-							throw std::runtime_error(error + " on line " + std::to_string(it->first));
+							throw std::runtime_error(error + " on line " + to_string(it->first));
 						}
 						it++;
 						line = it->second;
 					}
 					if (it == _extractedFile.end() || !isEndBlock(line))
-						throw std::runtime_error("Wrong Syntax, block not closed on line" + std::to_string(it->first));
+						throw std::runtime_error("Wrong Syntax, block not closed on line" + to_string(it->first));
 					try 
 					{
 						server.setLocation(location.getPath(), location);
@@ -116,7 +116,7 @@ void	ParserConfig::ParseFile()
 					catch (const std::exception& e)
 					{
 						error = e.what();
-						throw std::runtime_error(error + " on line " + std::to_string(it->first));
+						throw std::runtime_error(error + " on line " + to_string(it->first));
 					}
 					location = clean_location;
 				}
@@ -129,7 +129,7 @@ void	ParserConfig::ParseFile()
 					catch (const std::exception& e) 
 					{
 						error = e.what();
-						throw std::runtime_error(error + " on line " + std::to_string(it->first));
+						throw std::runtime_error(error + " on line " + to_string(it->first));
 					}
 				}
 				it++;
@@ -142,7 +142,7 @@ void	ParserConfig::ParseFile()
 			it++;
 		}
 		else
-			throw std::runtime_error("Wrong Line " + std::to_string(it->first) + " --> " + line[0] + " " + line[1]);
+			throw std::runtime_error("Wrong Line " + to_string(it->first) + " --> " + line[0] + " " + line[1]);
 	}
 }
 
