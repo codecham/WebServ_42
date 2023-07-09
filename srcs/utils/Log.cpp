@@ -26,7 +26,7 @@ Log::Log(const std::string msg)
 {
 	struct timeval current_time;
 	char time_buffer[100];
-	bzero(time_buffer, 100);
+	std::memset(time_buffer, 0, 100);
 	gettimeofday(&current_time, NULL);
 	strftime(time_buffer,100,"%F %R:%S", localtime(&current_time.tv_sec));
 	std::cout << "[" << time_buffer << "] : " << msg << std::endl;
@@ -36,7 +36,7 @@ Log::Log(const std::string color, const std::string msg)
 {
 	struct timeval current_time;
 	char time_buffer[100];
-	bzero(time_buffer, 100);
+	std::memset(time_buffer, 0, 100);
 	gettimeofday(&current_time, NULL);
 	strftime(time_buffer,100,"%F %R:%S", localtime(&current_time.tv_sec));
 	std::cout << color << "[" << time_buffer << "] : " << msg << RESET << std::endl;
@@ -46,7 +46,7 @@ Log::Log(const std::string color, const std::string level, const std::string msg
 {
 	struct timeval current_time;
 	char time_buffer[100];
-	bzero(time_buffer, 100);
+	std::memset(time_buffer, 0, 100);
 	gettimeofday(&current_time, NULL);
 	strftime(time_buffer,100,"%F %R:%S", localtime(&current_time.tv_sec));
 	std::cout << color << "[" << time_buffer << "] [" << level << "] : " << msg << RESET << std::endl;
@@ -59,7 +59,7 @@ Log::Log(const std::string color, const Server serv, const std::string msg)
 
 	addr.s_addr = serv.getHost();
 	char time_buffer[100];
-	bzero(time_buffer, 100);
+	std::memset(time_buffer, 0, 100);
 	gettimeofday(&current_time, NULL);
 	strftime(time_buffer,100,"%F %R:%S", localtime(&current_time.tv_sec));
 	std::cout << color;
@@ -75,7 +75,7 @@ Log::Log(const std::string color, const Server serv, struct sockaddr_in clientAd
 
 	addr.s_addr = serv.getHost();
 	char time_buffer[100];
-	bzero(time_buffer, 100);
+	std::memset(time_buffer, 0, 100);
 	gettimeofday(&current_time, NULL);
 	strftime(time_buffer,100,"%F %R:%S", localtime(&current_time.tv_sec));
 	std::cout << color;
