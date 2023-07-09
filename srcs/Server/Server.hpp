@@ -18,9 +18,10 @@
 #include <string>
 #include <map>
 #include <list>
-#include <cstdint>
+//#include <cstdint>
 #include <stdexcept>
 #include <arpa/inet.h>
+#include <cstdlib>
 #include <limits>
  #include <fcntl.h>
 #include "Location.hpp"
