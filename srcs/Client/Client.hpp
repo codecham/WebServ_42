@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/17 23:06:05 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/19 02:38:02 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/07/05 00:44:36 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ class Client
 		void setLastTime();
 		void setInactive();
 		void setRequest(Request& request);
+		void setRequestDone(bool value);
 
 
 		/*-----------GETTERS------------*/
@@ -50,6 +51,7 @@ class Client
 		bool				getActive() const;
 		unsigned long		getBodySize() const;
 		Request				getRequest() const;
+		bool 				getRequestDone() const;
 
 
 		/*--------MEMBER FUNCTION--------*/
@@ -71,6 +73,7 @@ class Client
 		bool				_active;
 		unsigned long		_bodySize;
 		Request				_request;
+		bool				_requestDone;
 };
 
 std::ostream& operator<<(std::ostream& os, const Client& client);

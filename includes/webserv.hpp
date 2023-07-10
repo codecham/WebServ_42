@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:35:35 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/30 19:44:57 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/07/10 13:30:59 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,11 @@ std::string 				createHTTPResponseWithImage(const std::string& imageFileName);
 void writeToLogFile(const std::string& text);
 
 /*--------------------------UTILS 2------------------------------*/
+
+/*
+	You can add here your functions that you code in the file utils/utils2.cpp :)
+
+*/
 
 template <typename T>
 std::string to_string(T value)

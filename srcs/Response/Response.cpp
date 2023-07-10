@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 18:51:08 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/30 20:06:06 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/07/10 13:34:45 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,12 +62,40 @@ void	Response::setVersion(const std::string str)
 void	Response::setCode(const std::string str)
 {
 	_code = str;
-	if (str == "200")
+	if (str == "100")
+		_message = "Continue";
+	else if (str == "101")
+		_message = "Switching Protocols";
+	else if (str == "200")
 		_message = "OK";
+	else if (str == "201")
+		_message = "Created";
+	else if (str == "204")
+		_message = "No Content";
+	else if (str == "301")
+		_message = "Moved Permanently";
+	else if (str == "302")
+		_message = "Found";
+	else if (str == "304")
+		_message = "Not Modified";
+	else if (str == "400")
+		_message = "Bad Request";
+	else if (str == "401")
+		_message = "Unauthorized";
+	else if (str == "403")
+		_message = "Forbidden";
 	else if (str == "404")
 		_message = "Not Found";
+	else if (str == "405")
+		_message = "Method Not Allowed";
+	else if (str == "500")
+		_message = "Internal Server Error";
+	else if (str == "502")
+		_message = "Bad Gateway";
+	else if (str == "503")
+		_message = "Service Unavailable";
 	else
-		_message = "Not Define Yet";
+		_message = "Unknow status code";
 }
 
 void	Response::setMessage(const std::string str)
@@ -262,7 +290,9 @@ void		Response::addFileToBody(const std::string& fileName)
 	std::ifstream file(fileName.c_str(), std::ios::binary);
 
 	if (!file)
+	{
 		return;
+	}
 	file.seekg(0, std::ios::end);
 	fileSize = file.tellg();
 	file.seekg(0, std::ios::beg);

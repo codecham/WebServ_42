@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:48:52 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/30 20:04:34 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/07/01 19:38:36 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -255,4 +255,31 @@ std::string timeOutPage()
                 "</body>\n"
                 "</html>";
     return response;
+}
+
+
+std::string createErrorPage(std::string& code, std::string message)
+{
+	std::string response;
+    response += "HTTP/1.1 ";
+	response += code;
+	response += message;
+	response += "\r\n";
+    response += "Content-Type: text/html\r\n"
+                "Connection: close\r\n"
+                "\r\n"
+                "<!DOCTYPE html>\n"
+                "<html>\n"
+                "<head>\n"
+                "<title>Error Page</title>\n"
+                "</head>\n"
+                "<body>\n";
+    response += "<h1>";
+	response += code;
+	response += message;
+	response += "</h1>\n";
+    response += "</body>\n"
+                "</html>";
+    return response;
+
 }

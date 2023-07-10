@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:41:29 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/30 20:11:57 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/07/10 14:01:31 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -286,9 +286,8 @@ void	ServerManager::addClientPoll(struct pollfd *poll_fds, Client& client)
 	{
 		if (poll_fds[i].fd == 0)
 		{
-			// std::cout << "Add the client in this index: " << i << std::endl;
 			poll_fds[i].fd = client.getSockfd();
-			poll_fds[i].events = (POLLIN | POLLHUP | POLLERR);
+			poll_fds[i].events = (POLLIN | POLLHUP | POLLERR | POLLOUT);
 			break ;
 		}
 		i++;
@@ -352,7 +351,14 @@ void	ServerManager::checkpollClient(struct pollfd *poll_fds)
 				addDataToClient(poll_fds, i, buffer, bytesRead);
 				checkRequest(poll_fds[i].fd);
 			}
+			// continue;
 		}
+		// if (poll_fds[i].revents & POLLOUT)
+		// {
+		// 	Client& client = findClientByfd(poll_fds[i].fd);
+		// 	if (client.getRequestDone())
+		// 		execRequest(client);
+		// }
 		i++;
 	}
 }
@@ -449,7 +455,7 @@ void	ServerManager::clearClients(struct pollfd *poll_fds)
 			{
 				eraseClientsListByfd(poll_fds[i].fd);
 				close(poll_fds[i].fd);
-				// Log(YELLOW, "INFO", "Connexion close for client on the socket " + std::to_string(poll_fds[i].fd));
+				// Log(YELLOW, "INFO", "Connexion close for client on the socket " + to_string(poll_fds[i].fd));
 				poll_fds[i].fd = 0;
 			}
 		}
@@ -491,14 +497,12 @@ void	ServerManager::checkRequest(int fd)
 
 	if (!client.isHTTPrequest())
 	{
-		/*
-			Code for not HTTP REQUEST
-		*/
 		return ;
 	}
 	if (client.allDataReceive())
 	{
 		client.createRequest();
+		client.setRequestDone(true);
 		execRequest(client);
 	}
 }
@@ -553,7 +557,9 @@ void ServerManager::writeToClient(int client_fd, const std::string &str) {
 	const ssize_t nbytes = send(client_fd, str.c_str(), str.length(), 0);
 	if (nbytes == -1)
 	{
-		Log(RED, "INFO", "Failed to send");
+		std::string err = strerror(errno);
+		Log(RED, "INFO", "Failed to send: " + err );
+		// writeToClient(client_fd, str);
 	}
 	else if ((size_t) nbytes < str.length()) {
 		writeToClient(client_fd, str.substr(nbytes));
@@ -580,25 +586,41 @@ void	ServerManager::execRequest(Client& client)
 
 		You will receive:
 
-		- Request: The object who's contains the parsed request
+			- Request&: The object who's contains the parsed request
 
-		- Server: The object who's contains the Server Config
+			- Server&: The object who's contains the Server Config
 
-		--> The goal now is to execute the request and create a HTTP Response to send to the client
+			- Response&: The object who's contains the response that we will send to client
 
 
-		For the moment, with the code bellow, that just send a little HTTP response define in /utils/utils.cpp.
-		
-		When you want to test with your code you can't Uncomment the 2 lines bellow and comment the second line "send(...)"
+		--> When you want test with your code, you can just:
+			- Uncomment lignes below (601 to 606)
+			- Comment last lignes below (608 to 625)
 	*/
 
 	// Exec(server, request, response);
+	// writeToClient(client.getSockfd(), response.getResponse());
+	// Log(MAGENTA, "INFO", "Response:\n" + response.getResponseNoBody());
+	// std::cout << CYAN << "---------------------------------------------\n" << RESET << std::endl;
+	// Log(ORANGE, "INFO", "Client set inactive");
+	// client.setInactive();
+
 	std::string resp ;
 
-	testExec(server, request, response);
-	resp = response.getResponse();
-	Log(MAGENTA, "INFO", "Response:\n" + response.getResponseNoBody());
-	writeToClient(client.getSockfd(), response.getResponse());
+	if(request.getMethod() == "POST")
+	{
+		Log(LIME, "INFO", "Request receive: ");
+		std::cout << request.getAllRequest() << std::endl;
+		send(client.getSockfd(), htmltestpage().c_str(), htmltestpage().size(), 0);
+	}
+	else
+	{
+		testExec(server, request, response);
+		resp = response.getResponse();
+		Log(MAGENTA, "INFO", "Response:\n" + response.getResponseNoBody());
+		writeToClient(client.getSockfd(), response.getResponse());
+	}
 	std::cout << CYAN << "---------------------------------------------\n" << RESET << std::endl;
 	client.setInactive();
+	Log(ORANGE, "INFO", "Client set inactive");
 }

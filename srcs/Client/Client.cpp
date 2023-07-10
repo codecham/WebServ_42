@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/19 02:35:26 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/19 02:38:58 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/07/05 00:46:01 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,7 @@ Client::Client()
 	_lastTime = time(NULL);
 	_active = true;
 	_bodySize = 0;
+	_requestDone = false;
 }
 
 Client::Client(const Client& copy)
@@ -32,6 +33,7 @@ Client::Client(const Client& copy)
 	_active = copy._active;
 	_bodySize = copy._bodySize;
 	_request = copy._request;
+	_requestDone = copy._requestDone;
 }
 
 Client::~Client()
@@ -52,6 +54,7 @@ Client&	Client::operator=(const Client& copy)
 		_active = copy._active;
 		_bodySize = copy._bodySize;
 		_request = copy._request;
+		_requestDone = copy._requestDone;
 	}
 	return(*this);
 
@@ -100,6 +103,11 @@ void 	Client::setRequest(Request& request)
 	_request = request;
 }
 
+void	Client::setRequestDone(bool value)
+{
+	_requestDone = value;
+}
+
 /*-----------GETTERS------------*/
 
 int 			Client::getSockfd() const
@@ -145,6 +153,11 @@ unsigned long	Client::getBodySize() const
 Request		Client::getRequest() const
 {
 	return(_request);
+}
+
+bool		Client::getRequestDone() const
+{
+	return(_requestDone);
 }
 
 /*--------MEMBER FUNCTION--------*/
