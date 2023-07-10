@@ -11,7 +11,7 @@ SRCS			=	srcs/main.cpp \
 					srcs/ServerManager/ServerManager.cpp \
 					srcs/Client/Client.cpp \
 					srcs/Response/Response.cpp \
-					srcs/testExec.cpp \
+					srcs/Methods/Method.cpp \
 
 CC				=	clang++
 
