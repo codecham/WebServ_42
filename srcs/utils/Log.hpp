@@ -13,13 +13,15 @@
 #ifndef LOG_HPP
 #define LOG_HPP
 
+#include "../../includes/webserv.hpp"
+#include "../Server/Server.hpp"
+
 #include <iostream>
 #include <string>
 #include <ctime>
 #include <cstring>
 #include <sys/time.h>
 #include <sys/socket.h>
-#include "../../includes/webserv.hpp"
 
 class Server;
 class Log

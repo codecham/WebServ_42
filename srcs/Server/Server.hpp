@@ -14,17 +14,17 @@
 #define SERVER_HPP
 
 #include "../../includes/webserv.hpp"
+#include "Location.hpp"
+
 #include <iostream>
 #include <string>
 #include <map>
 #include <list>
-//#include <cstdint>
 #include <stdexcept>
 #include <arpa/inet.h>
 #include <cstdlib>
 #include <limits>
 #include <fcntl.h>
-#include "Location.hpp"
 
 /*
 	Port		->		Listening port of this server. Mandatory.

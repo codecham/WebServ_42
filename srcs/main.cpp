@@ -11,6 +11,9 @@
 /* ************************************************************************** */
 
 #include "../includes/webserv.hpp"
+#include "../srcs/ParserConfig/ParserConfig.hpp"
+#include "../srcs/ServerManager/ServerManager.hpp"
+#include "../srcs/utils/Log.hpp"
 
 int main(int argc, char **argv)
 {

@@ -11,15 +11,20 @@
 /* ************************************************************************** */
 
 #ifndef CLIENT_HPP
-#define CLIENT_HPP
+# define CLIENT_HPP
+
+#include "../../includes/webserv.hpp"
+#include "../Request/Request.hpp"
 
 #include <iostream>
 #include <string>
+#include <cstring>
 #include <netinet/in.h>
-#include "../../includes/webserv.hpp"
+#include <arpa/inet.h>
 #include <time.h>
 
 class Request;
+
 class Client
 {
 	public:

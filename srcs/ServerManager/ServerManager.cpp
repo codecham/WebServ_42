@@ -10,8 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/webserv.hpp"
-
+#include "ServerManager.hpp"
 
 /*
 	Constructors, Assignement Operator, Destructors
@@ -557,7 +556,7 @@ void ServerManager::writeToClient(int client_fd, const std::string &str) {
 	const ssize_t nbytes = send(client_fd, str.c_str(), str.length(), 0);
 	if (nbytes == -1)
 	{
-		std::string err = strerror(errno);
+		std::string err = "Error";
 		Log(RED, "INFO", "Failed to send: " + err );
 		// writeToClient(client_fd, str);
 	}
@@ -615,7 +614,7 @@ void	ServerManager::execRequest(Client& client)
 	}
 	else
 	{
-		testExec(server, request, response);
+		Exec(server, request, response);
 		resp = response.getResponse();
 		Log(MAGENTA, "INFO", "Response:\n" + response.getResponseNoBody());
 		writeToClient(client.getSockfd(), response.getResponse());

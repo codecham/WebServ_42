@@ -13,11 +13,15 @@
 #ifndef LOCATION_HPP
 #define LOCATION_HPP
 
+#include "../../includes/webserv.hpp"
+
+#include <iostream>
 #include <string>
 #include <map>
 #include <vector>
-#include "../../includes/webserv.hpp"
 #include <stdexcept>
+#include <cstdlib>
+#include <limits>
 
 /*
 	path 			-> Path Location

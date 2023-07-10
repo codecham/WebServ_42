@@ -13,9 +13,11 @@
 #ifndef RESPONSE_HPP
 #define RESPONSE_HPP
 
+#include "../../includes/webserv.hpp"
+
 #include <iostream>
 #include <string>
-#include "../../includes/webserv.hpp"
+#include <fstream>
 
 class Response
 {

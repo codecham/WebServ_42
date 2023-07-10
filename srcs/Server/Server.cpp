@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include "../utils/Log.hpp"
 
 /*
 	Constructors, Destructors, Operators

@@ -14,6 +14,9 @@
 #define PARSERCONFIG_HPP
 
 #include "../../includes/webserv.hpp"
+#include "../Server/Server.hpp"
+#include "../utils/Log.hpp"
+
 #include <iostream>
 #include <string>
 #include <stdexcept>

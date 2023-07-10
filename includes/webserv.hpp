@@ -47,29 +47,18 @@
 #define CONNECTION_TIMEOUT 3 // Time in seconds before client get kicked out if no data was sent.
 #define DEFAULT_ERROR_PAGE_DIRECTORY "files/errors_pages/"
 
-#include "../srcs/utils/Log.hpp"
-#include "../srcs/ParserConfig/ParserConfig.hpp"
-#include "../srcs/Server/Server.hpp"
-#include "../srcs/Server/Location.hpp"
-#include "../srcs/Request/Request.hpp"
-#include "../srcs/ServerManager/ServerManager.hpp"
-#include "../srcs/Client/Client.hpp"
-#include "../srcs/Response/Response.hpp"
-
 #include <sstream>
 #include <map>
 #include <vector>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <sys/types.h>
 #include <sys/socket.h>
 #include <netdb.h>
 #include <poll.h>
 #include <signal.h>
+#include <string>
+#include <fstream>
 
 class Response;
 /*--------------------------UTILS------------------------------*/
@@ -89,7 +78,6 @@ std::vector<std::string>	splitInVectorByString(std::string& str, std::string cut
 std::vector<std::string> 	split_key_value_by_c(std::string& str, char c);
 std::string 				extractFileToString(std::string file_name);
 std::string 				extractFileBinary(std::string file_name);
-void						testExec(Server& server, Request& request, Response& response);
 std::string 				createHTTPResponseWithImage(const std::string& imageFileName);
 void writeToLogFile(const std::string& text);
 

@@ -13,9 +13,16 @@
 #ifndef SERVERMANAGER_HPP
 #define SERVERMANAGER_HPP
 
+#include "../../includes/webserv.hpp"
+#include "../Server/Server.hpp"
+#include "../Client/Client.hpp"
+#include "../Request/Request.hpp"
+#include "../Response/Response.hpp"
+#include "../Methods/Method.hpp"
+#include "../utils/Log.hpp"
+
 #include <iostream>
 #include <string>
-#include "../../includes/webserv.hpp"
 #include <csignal>
 
 class Server;

@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "Response.hpp"
-#include "../../includes/webserv.hpp"
 
 Response::Response()
 {
