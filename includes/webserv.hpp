@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:35:35 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/10 13:30:59 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/07/11 02:58:23 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,6 @@
 
 #define MAX_CLIENTS 1024
 #define CONNECTION_TIMEOUT 3 // Time in seconds before client get kicked out if no data was sent.
-#define DEFAULT_ERROR_PAGE_DIRECTORY "files/errors_pages/"
 
 #include <sstream>
 #include <map>
@@ -62,24 +61,21 @@
 
 class Response;
 /*--------------------------UTILS------------------------------*/
-void strTrimedWhiteSpace(std::string& str);
-bool emptyline(std::string& str);
-std::vector<std::string> split_key_value(std::string& str);
-std::map<int, std::vector<std::string> > extractFileInMap(std::ifstream& file);
-std::vector<std::string>	splitInVector(std::string& str, char c);
-bool fileExist(const std::string& path);
-bool readRights(const std::string& path);
-bool isDirectory(const std::string& path);
-void sigPipeHandler(int sig);
-std::string htmltestpage();
-std::string timeOutPage();
-void signalHandler(int sig);
-std::vector<std::string>	splitInVectorByString(std::string& str, std::string cut);
-std::vector<std::string> 	split_key_value_by_c(std::string& str, char c);
-std::string 				extractFileToString(std::string file_name);
-std::string 				extractFileBinary(std::string file_name);
-std::string 				createHTTPResponseWithImage(const std::string& imageFileName);
-void writeToLogFile(const std::string& text);
+void 										strTrimedWhiteSpace(std::string& str);
+bool 										emptyline(std::string& str);
+std::vector<std::string> 					split_key_value(std::string& str);
+std::map<int, std::vector<std::string> > 	extractFileInMap(std::ifstream& file);
+std::vector<std::string>					splitInVector(std::string& str, char c);
+bool 										fileExist(const std::string& path);
+bool 										readRights(const std::string& path);
+bool 										isDirectory(const std::string& path);
+void 										sigPipeHandler(int sig);
+std::string 								htmltestpage();
+std::string 								timeOutPage();
+void 										signalHandler(int sig);
+std::vector<std::string>					splitInVectorByString(std::string& str, std::string cut);
+std::vector<std::string> 					split_key_value_by_c(std::string& str, char c);
+std::string 								createErrorPage(std::string& code, std::string& message);
 
 /*--------------------------UTILS 2------------------------------*/
 

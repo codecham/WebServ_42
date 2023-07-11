@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 19:40:34 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/27 04:48:30 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/07/11 01:45:51 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@ class Location
 		void setCgiPath(std::string value);
 		void setCgiExt(std::string value);
 		void setClientBodySize(std::string value);
-		void setErrorPage(std::string value);
 		void setUploadStore(std::string value);
 
 		std::string 						getPath() const;
@@ -66,8 +65,6 @@ class Location
 		std::vector<std::string> 			getCgiExt() const;
 		unsigned long						getClientBodySize() const;
 		bool								getAllowedMethods(std::string method) const;
-		std::map<short, std::string>		getErrorPages() const;
-		std::string 					    getErrorPageCode(short code);
 		std::string 						getUploadStore() const;
 		
 		bool 								redirectionExist(std::string path);
@@ -82,7 +79,6 @@ class Location
 		std::vector<std::string>			_cgi_path;
 		std::vector<std::string>			_cgi_ext;
 		unsigned int 						_max_body_size;
-		std::map<short, std::string>  		_error_pages;
 		std::string							_upload_store;
 
 		void 	isValidToken(std::string& token);

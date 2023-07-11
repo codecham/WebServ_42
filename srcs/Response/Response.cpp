@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 18:51:08 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/10 13:34:45 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/07/11 02:52:31 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,6 +28,7 @@ Response::Response(const Response& copy)
 	_header = copy._header;
 	_body = copy._body;
 	_mimeTypes = copy._mimeTypes;
+	_errors_pages = copy._errors_pages;
 }
 
 Response::~Response()
@@ -45,6 +46,7 @@ Response&	Response::operator=(const Response& copy)
 		_header = copy._header;
 		_body = copy._body;
 		_mimeTypes = copy._mimeTypes;
+		_errors_pages = copy._errors_pages;
 	}
 	return(*this);
 }
@@ -53,12 +55,12 @@ Response&	Response::operator=(const Response& copy)
 	--------------------SETTERS----------------------	
 */
 
-void	Response::setVersion(const std::string str)
+void	Response::setVersion(const std::string& str)
 {
 	_version = str;
 }
 
-void	Response::setCode(const std::string str)
+void	Response::setCode(const std::string& str)
 {
 	_code = str;
 	if (str == "100")
@@ -97,17 +99,17 @@ void	Response::setCode(const std::string str)
 		_message = "Unknow status code";
 }
 
-void	Response::setMessage(const std::string str)
+void	Response::setMessage(const std::string& str)
 {
 	_message = str;
 }
 
-void	Response::setHeader(const std::string key, const std::string value)
+void	Response::setHeader(const std::string& key, const std::string& value)
 {
 	_header.insert(std::make_pair(key, value));
 }
 
-void	Response::setBody(const std::string str)
+void	Response::setBody(const std::string& str)
 {
 	_body = str;
 	_header["Content-Length"] = to_string(str.size());
@@ -273,11 +275,25 @@ void	Response::create_mimes_types()
 	insert_mimes_types(".7z", "application/x-7z-compressed");
 }
 
-void		Response::createResponse(const std::string& code, const std::string& file)
+void		Response::createResponse(const std::string& code, const std::string& file, Server& server)
 {
+	_errors_pages = server.getErrorPages();
+	_server = server;
+	cleanErrorsPage();
 	setCode(code);
-	if (!file.empty())
-		setPage(file);
+	setPage(file);
+	buildResponse();
+}
+
+void		Response::createResponse(const std::string& code, Server& server)
+{
+	_errors_pages = server.getErrorPages();
+	_server = server;
+	cleanErrorsPage();
+	if (code == "200")
+		setCode(code);
+	else
+		setErrorPage(code);
 	buildResponse();
 }
 
@@ -290,6 +306,7 @@ void		Response::addFileToBody(const std::string& fileName)
 
 	if (!file)
 	{
+		setErrorPage("500");
 		return;
 	}
 	file.seekg(0, std::ios::end);
@@ -320,6 +337,37 @@ void		Response::setMimeType(const std::string& fileName)
 		_header.insert(std::make_pair("Content-Type", it->second));
 	else
 		_header.insert(std::make_pair("Content-Type", "application/octet-stream"));
+}
+
+void		Response::cleanErrorsPage()
+{
+	std::map<int, std::string>::iterator it = _errors_pages.begin();
+	std::string root = _server.getRoot() + "/";
+	
+	while (it != _errors_pages.end())
+	{
+		if (!it->second.empty())
+		{
+			if (fileExist(root + it->second) && readRights(root + it->second))
+				it->second = root + it->second;
+			else
+				it->second = "";
+		}
+		it++;
+	}
+}
+
+void		Response::setErrorPage(const std::string& code)
+{
+	setCode(code);
+	if (!_errors_pages[atoi(code.c_str())].empty())
+		setPage(_errors_pages[atoi(code.c_str())]);
+	else
+	{
+		_body = createErrorPage(_code, _message);
+		_header.insert(std::make_pair("Content-Type", "text/html"));
+		_header.insert(std::make_pair("Content-Length", to_string(_body.size())));
+	}
 }
 
 /*------------------------------------------------*/

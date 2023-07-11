@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:41:29 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/10 14:01:31 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/07/11 03:01:18 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -597,29 +597,9 @@ void	ServerManager::execRequest(Client& client)
 			- Comment last lignes below (608 to 625)
 	*/
 
-	// Exec(server, request, response);
-	// writeToClient(client.getSockfd(), response.getResponse());
-	// Log(MAGENTA, "INFO", "Response:\n" + response.getResponseNoBody());
-	// std::cout << CYAN << "---------------------------------------------\n" << RESET << std::endl;
-	// Log(ORANGE, "INFO", "Client set inactive");
-	// client.setInactive();
-
-	std::string resp ;
-
-	if(request.getMethod() == "POST")
-	{
-		Log(LIME, "INFO", "Request receive: ");
-		std::cout << request.getAllRequest() << std::endl;
-		send(client.getSockfd(), htmltestpage().c_str(), htmltestpage().size(), 0);
-	}
-	else
-	{
-		Exec(server, request, response);
-		resp = response.getResponse();
-		Log(MAGENTA, "INFO", "Response:\n" + response.getResponseNoBody());
-		writeToClient(client.getSockfd(), response.getResponse());
-	}
+	Exec(server, request, response);
+	writeToClient(client.getSockfd(), response.getResponse());
+	Log(MAGENTA, "INFO", "Response:\n" + response.getResponseNoBody());
 	std::cout << CYAN << "---------------------------------------------\n" << RESET << std::endl;
 	client.setInactive();
-	Log(ORANGE, "INFO", "Client set inactive");
 }

@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/03 19:30:09 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/27 04:52:43 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/07/11 01:53:05 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,6 @@
 
 Location::Location()
 {
-	std::string error_directory = DEFAULT_ERROR_PAGE_DIRECTORY;
-
 	_path = "";
 	_root = "";
 	_autoindex = "";
@@ -25,21 +23,6 @@ Location::Location()
 	_methods.push_back(false); //POST
 	_methods.push_back(false); //DELETE
 	_max_body_size = 0;
-	_error_pages[301] = error_directory + "301.html";
-	_error_pages[302] = error_directory + "302.html";
-	_error_pages[400] = error_directory + "400.html";
-	_error_pages[401] = error_directory + "401.html";
-	_error_pages[402] = error_directory + "402.html";
-	_error_pages[403] = error_directory + "403.html";
-	_error_pages[404] = error_directory + "404.html";
-	_error_pages[405] = error_directory + "405.html";
-	_error_pages[406] = error_directory + "406.html";
-	_error_pages[500] = error_directory + "500.html";
-	_error_pages[501] = error_directory + "501.html";
-	_error_pages[502] = error_directory + "502.html";
-	_error_pages[503] = error_directory + "503.html";
-	_error_pages[504] = error_directory + "504.html";
-	_error_pages[505] = error_directory + "505.html";
 }
 
 Location::Location(const Location& copy)
@@ -55,7 +38,6 @@ Location::Location(const Location& copy)
 		_cgi_ext = copy._cgi_ext;
 		_cgi_path = copy._cgi_path;
 		_max_body_size = copy._max_body_size;
-		_error_pages = copy._error_pages;
 	}
 }
 
@@ -77,7 +59,6 @@ Location&	Location::operator=(const Location& copy)
 		_cgi_ext = copy._cgi_ext;
 		_cgi_path = copy._cgi_path;
 		_max_body_size = copy._max_body_size;
-		_error_pages = copy._error_pages;
 	}
 	return(*this);
 }
@@ -189,29 +170,6 @@ void	Location::setClientBodySize(std::string value)
 	_max_body_size = (unsigned int)tmp;
 }
 
-void	Location::setErrorPage(std::string value)
-{
-	std::vector<std::string> vec;
-	long tmp;
-	char *endptr;
-
-	isValidToken(value);
-	if (value.empty())
-		return ;
-	vec = splitInVector(value, ' ');
-	if (vec.size() != 2 || vec[0].size() != 3)
-		throw std::runtime_error("Wrong Error_page format");
-	tmp = strtol(vec[0].c_str(), &endptr, 10);
-	if (*endptr)
-		throw std::runtime_error("Wrong Error_page format");
-	if (tmp < 301 || tmp > 505)
-		throw std::runtime_error("Wrong code error. Must be between 301 and 505");
-	/*
-		need to check if the file exist?
-	*/
-	_error_pages[tmp] = vec[1];
-}
-
 void 	Location::setUploadStore(std::string value)
 {
 	isValidToken(value);
@@ -284,15 +242,6 @@ std::string		Location::getUploadStore() const
 	return(_upload_store);
 }
 
-std::map<short, std::string>		Location::getErrorPages() const
-{
-	return(_error_pages);
-}
-
-std::string 					    Location::getErrorPageCode(short code)
-{
-	return(_error_pages[code]);
-}
 
 void 	Location::isValidToken(std::string& token)
 {
@@ -332,9 +281,7 @@ bool 	Location::redirectionExist(std::string path)
 std::ostream& operator<<(std::ostream& os, const Location& location)
 {
 	std::map<std::string, std::string>	redirection = location.getRedirectionMap();
-	std::map<short, std::string>  		error_pages = location.getErrorPages(); 
 	std::map<std::string, std::string>::iterator it = redirection.begin();
-	std::map<short, std::string>::iterator it_errpage = error_pages.begin();
 	std::vector<std::string> cgi_path = location.getCgiPath();
 	std::vector<std::string> cgi_ext = location.getCgiExt();
 	unsigned int i = 0;
@@ -354,15 +301,6 @@ std::ostream& operator<<(std::ostream& os, const Location& location)
 		{
 			os << "\t" << it->first << " --> " << it->second << std::endl;
 			it++;
-		}
-	}
-	if (!(error_pages.empty()))
-	{
-		while (it_errpage != error_pages.end())
-		{
-			if (!it_errpage->second.empty())
-				os << "\t" << it_errpage->first << " --> " << it_errpage->second << std::endl;
-			it_errpage++;
 		}
 	}
 	if (!(cgi_path.empty()))

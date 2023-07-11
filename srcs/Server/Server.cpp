@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 13:39:18 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/10 13:37:08 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/07/11 01:53:30 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,30 +18,28 @@
 */
 
 Server::Server()
-{
-	std::string error_directory = DEFAULT_ERROR_PAGE_DIRECTORY;
-	
+{	
 	_port = 0;
 	_host = 0;
 	_name = "";
 	_index = "";
 	_root = "";
 	_max_body_size = 0;
-	_error_pages[301] = error_directory + "301.html";
-	_error_pages[302] = error_directory + "302.html";
-	_error_pages[400] = error_directory + "400.html";
-	_error_pages[401] = error_directory + "401.html";
-	_error_pages[402] = error_directory + "402.html";
-	_error_pages[403] = error_directory + "403.html";
-	_error_pages[404] = error_directory + "404.html";
-	_error_pages[405] = error_directory + "405.html";
-	_error_pages[406] = error_directory + "406.html";
-	_error_pages[500] = error_directory + "500.html";
-	_error_pages[501] = error_directory + "501.html";
-	_error_pages[502] = error_directory + "502.html";
-	_error_pages[503] = error_directory + "503.html";
-	_error_pages[504] = error_directory + "504.html";
-	_error_pages[505] = error_directory + "505.html";
+	_error_pages[301] = "";
+	_error_pages[302] = "";
+	_error_pages[400] = "";
+	_error_pages[401] = "";
+	_error_pages[402] = "";
+	_error_pages[403] = "";
+	_error_pages[404] = "";
+	_error_pages[405] = "";
+	_error_pages[406] = "";
+	_error_pages[500] = "";
+	_error_pages[501] = "";
+	_error_pages[502] = "";
+	_error_pages[503] = "";
+	_error_pages[504] = "";
+	_error_pages[505] = "";
 	_methods.push_back(true); //GET
 	_methods.push_back(false); //POST
 	_methods.push_back(false); //DELETE
@@ -235,7 +233,7 @@ unsigned int					Server::getMaxBodySize() const
 	return(_max_body_size);
 }
 
-std::map<short, std::string>	Server::getErrorPages() const
+std::map<int, std::string>		Server::getErrorPages() const
 {
 	return (_error_pages);
 }

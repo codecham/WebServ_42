@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 18:35:06 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/30 18:16:55 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/07/11 02:52:01 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,13 @@
 #define RESPONSE_HPP
 
 #include "../../includes/webserv.hpp"
+#include "../Server/Server.hpp"
 
 #include <iostream>
 #include <string>
 #include <fstream>
 
+class Server;
 class Response
 {
 	public:
@@ -28,11 +30,11 @@ class Response
 		Response& operator=(const Response& copy);
 
 		/*-----------SETTERS-----------*/
-		void setVersion(const std::string str);
-		void setCode(const std::string str);
-		void setMessage(const std::string str);
-		void setHeader(const std::string key, const std::string value);
-		void setBody(const std::string str);
+		void setVersion(const std::string& str);
+		void setCode(const std::string& str);
+		void setMessage(const std::string& str);
+		void setHeader(const std::string& key, const std::string& value);
+		void setBody(const std::string& str);
 		void setPage(const std::string& file);
 
 		/*------------GETTER-----------*/
@@ -46,7 +48,8 @@ class Response
 		std::string getResponseNoBody();
 
 		void 		buildResponse();
-		void		createResponse(const std::string& code, const std::string& file);
+		void		createResponse(const std::string& code, const std::string& file, Server& server);
+		void		createResponse(const std::string& code, Server& server);
 
 	private:
 		std::string	_version;
@@ -56,12 +59,16 @@ class Response
 		std::string _body;
 		std::string _response;
 		std::map<std::string, std::string> _mimeTypes;
+		std::map<int, std::string>		   _errors_pages;
+		Server	_server;
 
 		void		insert_mimes_types(std::string key, std::string value);
 		void		create_mimes_types();
 		std::string createline(std::string line);
 		void		addFileToBody(const std::string& fileName);
 		void		setMimeType(const std::string& fileName);
+		void		cleanErrorsPage();
+		void		setErrorPage(const std::string& code);
 };
 
 std::ostream& operator<<(std::ostream& os, const Response& response);

@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 01:26:04 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/10 13:39:50 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/07/11 01:51:21 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ class Server
 		std::string 					getName() const;
 		uint16_t 						getPort() const;
 		unsigned int					getMaxBodySize() const;
-		std::map<short, std::string>	getErrorPages() const;
+		std::map<int, std::string>		getErrorPages() const;
 		std::string 					getErrorPageCode(short code);
 		bool 							getIsDefault() const;
 		std::string						getRoot() const;
@@ -83,7 +83,7 @@ class Server
 		std::string 					_name;
 		uint16_t						_port;
 		unsigned int					_max_body_size;
-		std::map<short, std::string>  	_error_pages;
+		std::map<int, std::string>  	_error_pages;
 		std::string						_root;
 		std::string						_index;
 		std::map<std::string, Location> _locations;
