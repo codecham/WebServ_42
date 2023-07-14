@@ -104,7 +104,7 @@ void	Exec(Server& server, Request& request, Response& response)
 					response.createResponse("403", server);
 					return ;
 				}
-				response.createResponse("403", server);
+				response.createResponse("404", server);
 				return ;
 			}
 			else
