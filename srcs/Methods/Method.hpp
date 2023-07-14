@@ -6,6 +6,7 @@
 # include "../Server/Server.hpp"
 # include "../Request/Request.hpp"
 # include "../Response/Response.hpp"
+# include "../Server/Location.hpp"
 
 # include <iostream>
 # include <cstring>
@@ -14,8 +15,6 @@
 # include <arpa/inet.h>
 # include <netdb.h>
 # include <unistd.h>
-
-# define BUFFER_SIZE = 4096;
 
 void	Exec(Server& server, Request& request, Response& response);
 
