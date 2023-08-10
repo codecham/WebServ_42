@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 18:51:08 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/11 02:52:31 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/09 22:31:15 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -164,20 +164,18 @@ std::string Response::getResponse() const
 	return(_response);
 }
 
-std::string Response::getResponseNoBody()
+std::string Response::getResponseNoBody() const
 {
-	std::map<std::string, std::string>::iterator it = _header.begin();
+	std::map<std::string, std::string>::const_iterator it = _header.begin();
 	std::string response = _version + " " + _code + " " +_message + "\n";
 
-	while(it != _header.end())
+	while(it != _header.end() && PRINT_RESP_HEADER)
 	{
 		response += it->first + ": " + it->second + "\n";
 		it++;
 	}
 	return(response);
 }
-
-
 
 /*
 	--------------MEMBER FUNCTIONS-------------------
@@ -290,10 +288,24 @@ void		Response::createResponse(const std::string& code, Server& server)
 	_errors_pages = server.getErrorPages();
 	_server = server;
 	cleanErrorsPage();
-	if (code == "200")
+	if (code == "200" || code == "301")
 		setCode(code);
 	else
 		setErrorPage(code);
+	buildResponse();
+}
+
+void		Response::createResponseAutoIndex(const std::string& directory, Server& server)
+{
+	int status_code;
+	
+	_errors_pages = server.getErrorPages();
+	_server = server;
+	cleanErrorsPage();
+	std::cout << "1" << std::endl;
+	status_code = setAutoIndex(directory);
+	if (status_code != 0)
+		setErrorPage(to_string(status_code));
 	buildResponse();
 }
 
@@ -312,12 +324,9 @@ void		Response::addFileToBody(const std::string& fileName)
 	file.seekg(0, std::ios::end);
 	fileSize = file.tellg();
 	file.seekg(0, std::ios::beg);
-
 	std::vector<char> fileContent(fileSize);
 	file.read(&fileContent[0], fileSize);
-
 	file.close();
-
 	_header.insert(std::make_pair("Content-Length", to_string(fileSize)));
 	setMimeType(fileName);
 	body.write(&fileContent[0], fileSize);
@@ -329,12 +338,17 @@ void		Response::setMimeType(const std::string& fileName)
 {
 	std::map<std::string, std::string>::iterator it;
 	std::string ext;
-	unsigned int pos = fileName.find_last_of(".");
+	std::size_t pos = fileName.find_last_of(".");
 
-	ext = fileName.substr(pos);
-	it = _mimeTypes.find(ext);
-	if (it != _header.end())
-		_header.insert(std::make_pair("Content-Type", it->second));
+	if (pos != std::string::npos)
+	{
+		ext = fileName.substr(pos);
+		it = _mimeTypes.find(ext);
+		if (it != _mimeTypes.end())
+			_header.insert(std::make_pair("Content-Type", it->second));
+		else
+			_header.insert(std::make_pair("Content-Type", "application/octet-stream"));
+	}
 	else
 		_header.insert(std::make_pair("Content-Type", "application/octet-stream"));
 }
@@ -370,10 +384,72 @@ void		Response::setErrorPage(const std::string& code)
 	}
 }
 
+int			Response::setAutoIndex(const std::string& path)
+{
+	DIR *dir;
+	struct stat pathStat;
+	std::multimap<int, std::string> contentMap;
+
+	std::cout << "2" << std::endl;
+	if (stat(path.c_str(), &pathStat) != 0) 
+        return (404);
+    if (!S_ISDIR(pathStat.st_mode)) 
+        return (400);
+	if (!readRights(path))
+		return(403);
+	dir = opendir(path.c_str());
+	if (!dir)
+		return(500);
+	closedir(dir);
+	contentMap = readDirectory(path);
+	setCode("200");
+	setHeader("Content-Type:", "text/html");
+	_body = setHtmlAutoIndexPage(contentMap, path);
+	return(0);
+}
+
+
+std::string Response::setHtmlAutoIndexPage(std::multimap<int, std::string>& contentMap, const std::string& path)
+{
+	std::string page;
+
+	page += "<html>\n";
+	page += "<head>\n";
+	page += "<title> Index Of " + path + "</title>\n";
+	page += "</head>\n";
+	page += "<body>\n";
+	page += "<h1> Index Of " + path + "</h1>\n";
+	page += "<hr>\n";
+	page += "<pre>\n";
+	for (std::multimap<int, std::string>::iterator it = contentMap.begin(); it != contentMap.end(); ++it)
+	{
+		page += "<a href = \"";
+        if (it->first == 0)
+            page += it->second + "/";
+        else if (it->first == 1)
+            page += it->second;
+		page += "\">";
+        if (it->first == 0)
+            page += it->second + "/";
+        else if (it->first == 1)
+            page += it->second;
+		page += "</a>\n";
+    }
+	page += "</pre>\n";
+	page += "<hr>\n";
+	page += "</body>\n";
+	page += "</html>\n";
+	return(page);
+}
+
+
 /*------------------------------------------------*/
 
 std::ostream& operator<<(std::ostream& os, const Response& response)
 {
-	os << response.getResponse() << std::endl; 
+	if (PRINT_RESP_BODY)
+		os << response.getResponse();
+	else
+		os << response.getResponseNoBody();
 	return(os);
 }

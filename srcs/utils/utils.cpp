@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:48:52 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/11 02:56:56 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/08 18:18:23 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,19 @@ std::vector<std::string>	splitInVectorByString(std::string& str, std::string cut
 	return(split);
 }
 
+
+void 					splitString(const std::string& input, const std::string& delimiter, std::vector<std::string>& output) 
+{
+    size_t start = 0;
+    size_t end = input.find(delimiter);
+
+    while (end != std::string::npos) {
+        output.push_back(input.substr(start, end - start));
+        start = end + delimiter.size();
+        end = input.find(delimiter, start);
+    }
+    output.push_back(input.substr(start));
+}
 
 /*
 	Take a string and remove all spaces and tabulations at begin and at the end 
@@ -232,8 +245,9 @@ std::string htmltestpage()
 {
     std::string response = "HTTP/1.1 200 OK\r\n";
     response += "Content-Type: text/html\r\n";
+	response += "Content-Length: 91\r\n";
     response += "\r\n";
-    response += "<html><head>\n</head><body><h1>Hello from webserv! I'm just a test response</p></body></html>";
+    response += "<html><head>\n</head>\n<body><h1>Hello from webserv! I'm just a test response</p></body></html>";
     return response;
 	return(response);
 }
@@ -274,5 +288,57 @@ std::string createErrorPage(std::string& code, std::string& message)
     response += "</body>\n"
                 "</html>";
     return response;
+}
 
+std::multimap<int, std::string> readDirectory(const std::string& folderPath) 
+{
+    std::multimap<int, std::string> contentMap;
+    
+    DIR* directory = opendir(folderPath.c_str());
+    if (directory) {
+        dirent* entry;
+        while ((entry = readdir(directory)) != NULL) {
+            std::string name = entry->d_name;
+            
+            if (name != ".") {
+                std::string fullPath = folderPath + "/" + name;
+                
+                if (entry->d_type == DT_DIR) {
+                    contentMap.insert(std::make_pair(0, name));
+                } else if (entry->d_type == DT_REG) {
+                    contentMap.insert(std::make_pair(1, name));
+                }
+            }
+        }
+        
+        closedir(directory);
+    } else {
+        std::cout << "Erreur lors de l'ouverture du dossier." << std::endl;
+    }
+    
+    return contentMap;
+}
+
+bool	pathIsDirectory(std::string& path)
+{
+	if (path.empty())
+		return(false);
+	if (path[path.size() - 1] == '/')
+		return(true);
+	return(false);
+}
+
+int	setOptionSocket(int fd)
+{
+	int	optval = 1;
+
+	//?-	Reusable addresss
+	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)))
+		return 1;
+	//?-	Protection form sigPipe signal
+	if (setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, (void *)&optval, sizeof(optval)))
+		return 1;
+	//?-	Non Blocking fd
+	fcntl(fd, F_SETFL,	O_NONBLOCK);
+	return 0;
 }

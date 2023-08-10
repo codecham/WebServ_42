@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 18:35:06 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/11 02:52:01 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/09 22:28:01 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <dirent.h>
+#include <sys/stat.h>
 
 class Server;
 class Response
@@ -45,11 +47,12 @@ class Response
 		std::string getHeaderByKey(std::string key);
 		std::string getBody() const;
 		std::string getResponse() const;
-		std::string getResponseNoBody();
+		std::string getResponseNoBody() const;
 
 		void 		buildResponse();
 		void		createResponse(const std::string& code, const std::string& file, Server& server);
 		void		createResponse(const std::string& code, Server& server);
+		void		createResponseAutoIndex(const std::string& directory, Server& server);
 
 	private:
 		std::string	_version;
@@ -69,6 +72,8 @@ class Response
 		void		setMimeType(const std::string& fileName);
 		void		cleanErrorsPage();
 		void		setErrorPage(const std::string& code);
+		int			setAutoIndex(const std::string& directory);
+		std::string setHtmlAutoIndexPage(std::multimap<int, std::string>& contentMap, const std::string& path);
 };
 
 std::ostream& operator<<(std::ostream& os, const Response& response);

@@ -13,11 +13,14 @@ void	Exec(Server& server, Request& request, Response& response)
 	std::string path = request.getPath();
 	bool		isredirection = false;
 
+	// std::cout << server << std::endl;
+
 	if (server.getAllowedMethods("GET"))
 	{
 		if (server.locationExist(path))
 		{
 			location = server.getLocationByPath(path);
+			std::cout << "location found: " << std::endl;
 			redirection = location.getRedirection(path);
 			if (!redirection.empty()) // if redirection exist
 			{

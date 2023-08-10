@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/13 00:53:15 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/30 03:31:49 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/09 22:10:14 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,10 @@ Request::Request()
 
 Request::Request(Client& client)
 {
-	_allRequest = client.getDataRecv();
+	parseHeaders(client.getHeader());
 	_bodySize = client.getBodySize();
-	parseRequest();
+	if (_bodySize > 0)
+		_body = client.getBody();
 }
 
 Request::Request(const Request& copy)
@@ -59,27 +60,27 @@ Request&	Request::operator=(const Request& copy)
 
 /*-----------GETTERS------------*/
 
-std::string 						Request::getMethod()
+std::string 						Request::getMethod() const
 {
 	return(_method);
 }
 
-std::string 						Request::getPath()
+std::string 						Request::getPath() const
 {
 	return(_path);
 }
 
-std::string 						Request::getVersion()
+std::string 						Request::getVersion() const
 {
 	return(_version);
 }
 
-std::map<std::string, std::string> 	Request::getHeader()
+std::map<std::string, std::string> 	Request::getHeader() const
 {
 	return(_header);
 }
 
-std::string 						Request::getBody()
+std::string 						Request::getBody() const
 {
 	return(_body);
 }
@@ -92,12 +93,12 @@ std::string							Request::getHeaderByKey(const std::string& key)
 		return ("");
 }
 
-std::string							Request::getAllRequest()
+std::string							Request::getAllRequest() const
 {
 	return(_allRequest);
 }
 
-unsigned long						Request::getBodySize()
+long long							Request::getBodySize() const
 {
 	return(_bodySize);
 }
@@ -135,16 +136,21 @@ void	Request::setBody(const std::string& str)
 
 /*--------MEMBER FUNCTION--------*/
 
-void	Request::parseRequest()
+void	Request::parseHeaders(std::string headers)
 {
-	std::string request = _allRequest.substr(0, _allRequest.find("\r\n\r\n"));
-	std::vector<std::string> vec = splitInVectorByString(request, "\r\n");
+	std::vector<std::string> split;
+	std::vector<std::string>::iterator it;
 
-	if (_bodySize != 0)
-		_body = _allRequest.substr(_allRequest.find("\r\n\r\n"), (_allRequest.size() - request.size()));
-	setfirstline(vec[0]);
-	for (unsigned int i = 1 ; i < vec.size() ; i++)
-		setHeader(vec[i]);
+	splitString(headers, "\r\n", split);
+	it = split.begin();
+	setfirstline(*it);
+	it++;
+	while (it != split.end())
+	{
+		if (!it->empty())
+			setHeaders(*it);
+		it++;
+	}
 }
 
 void	Request::setfirstline(std::string str)
@@ -171,18 +177,21 @@ void	Request::setHeaders(std::string str)
 
 std::ostream& operator<<(std::ostream& os, Request& request)
 {
-	// std::map<std::string, std::string> header = request.getHeader();
-	// std::map<std::string, std::string>::iterator it = header.begin();
+	std::map<std::string, std::string> header = request.getHeader();
+	std::map<std::string, std::string>::iterator it = header.begin();
 
 	os << request.getMethod() << " ";
 	os << request.getPath() << " ";
 	os << request.getVersion() << std::endl;
-	// while (it != header.end())
-	// {
-	// 	os << it->first << ": " << it->second << std::endl;
-	// 	it++;
-	// }
-	// os << "\n";
-	// os << request.getBody() << std::endl;
+	while (it != header.end() && PRINT_REQ_HEADER)
+	{
+		os << it->first << ": " << it->second << std::endl;
+		it++;
+	}
+	if (!request.getBody().empty() && PRINT_REQ_BODY)
+	{
+		os << "\n";
+		os << request.getBody() << std::endl;
+	}
 	return(os);
 }

@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:35:35 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/11 02:58:23 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/09 22:40:07 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,12 +39,21 @@
 #define GOLD         "\033[38;5;220m"
 #define GRAY         "\033[38;5;8m"
 
+
 #define GET 0
 #define POST 1
 #define DELETE 2
 
 #define MAX_CLIENTS 1024
-#define CONNECTION_TIMEOUT 3 // Time in seconds before client get kicked out if no data was sent.
+#define CONNECTION_TIMEOUT 30 // Time in seconds before client get kicked out if no data was sent.
+
+#define	MAXREAD	50000
+#define	MAXSEND	50000
+
+#define PRINT_REQ_BODY 0
+#define PRINT_RESP_BODY 0
+#define PRINT_REQ_HEADER 0
+#define PRINT_RESP_HEADER 0
 
 #include <sstream>
 #include <map>
@@ -58,6 +67,9 @@
 #include <signal.h>
 #include <string>
 #include <fstream>
+#include <dirent.h>
+#include <iostream>
+#include <fcntl.h>
 
 class Response;
 /*--------------------------UTILS------------------------------*/
@@ -76,6 +88,10 @@ void 										signalHandler(int sig);
 std::vector<std::string>					splitInVectorByString(std::string& str, std::string cut);
 std::vector<std::string> 					split_key_value_by_c(std::string& str, char c);
 std::string 								createErrorPage(std::string& code, std::string& message);
+std::multimap<int, std::string> 			readDirectory(const std::string& folderPath);
+bool										pathIsDirectory(std::string& path);
+int											setOptionSocket(int fd);
+void 										splitString(const std::string& input, const std::string& delimiter, std::vector<std::string>& output);
 
 /*--------------------------UTILS 2------------------------------*/
 

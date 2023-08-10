@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:41:29 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/11 03:01:18 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/09 22:37:00 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,8 @@ ServerManager::ServerManager()
 
 ServerManager::ServerManager(std::list<Server> server_list)
 {
+	_nbServer = 0;
+	_nbClient = 0;
 	_server_list = server_list;
 	checkServers();
 	createSockets();
@@ -35,7 +37,6 @@ ServerManager::ServerManager(const ServerManager& copy)
 {
 	_server_list = copy._server_list;
 	_serv_fds = copy._serv_fds;
-	_servSocket = copy._servSocket;
 }
 
 ServerManager::~ServerManager()
@@ -49,7 +50,6 @@ ServerManager&	ServerManager::operator=(const ServerManager& copy)
 	{
 		_server_list = copy._server_list;
 		_serv_fds = copy._serv_fds;
-		_servSocket = copy._servSocket;
 	}
 	return(*this);
 }
@@ -194,326 +194,199 @@ void	ServerManager::setServfds()
 }
 
 
-
 /*
-	This function run an infinite loop and wait event on our servers sockets
-
-	While a clients try to connect to a socket, we catch the event and exec all function for manage them
-
+	Add serv socket fds to pollfds vector
 */
 
-void	ServerManager::runServers()
+void	ServerManager::addServToPoll()
 {
-	struct pollfd poll_fds[MAX_CLIENTS + _serv_fds.size()];
 	std::map<int, std::vector<Server> >::iterator it = _serv_fds.begin();
-	int clientSockets[MAX_CLIENTS];
-	unsigned int i = 0;
-	int poll_result;
 
-	memset(&poll_fds, 0, sizeof(poll_fds));
-	memset(&clientSockets, 0, sizeof(clientSockets));
 	while (it != _serv_fds.end())
 	{
-		_servSocket.push_back(it->first);
-		poll_fds[i].fd = it->first;
-		poll_fds[i].events = POLLIN;
+		struct pollfd tmp;
+		memset(&tmp, 0, sizeof(tmp));
+		tmp.fd = it->first;
+		tmp.events = POLLIN | POLLOUT | POLLERR | POLLHUP;
+		tmp.revents = 0;
+		_pollFds.push_back(tmp);
 		it++;
-		i++;
-	}
-	Log(BLUE, "INFO", "Waiting clients connexions...");
-	while(1)
-	{
-		i = 0;
-		poll_result = poll(poll_fds, MAX_CLIENTS + _serv_fds.size(), 0);
-		if (poll_result > 0)
-		{
-			checkpollServ(poll_fds);
-			checkpollClient(poll_fds);
-			// checkClientRequest(poll_fds);
-		}
-		checkClientsTimeOut();
-		clearClients(poll_fds);
-	}
+	}	
 }
 
-
-
 /*
-	Check event on the server socket.
-	If a new client is detected, add him in the client list
+	Add a client fd to pollfds vector
 */
 
-void	ServerManager::checkpollServ(struct pollfd *poll_fds)
+void	ServerManager::addClientToPoll(Client& client)
 {
-	unsigned int i = 0;
-
-	while (i < _servSocket.size())
-	{
-		if (poll_fds[i].revents & POLLIN)
-		{
-			/*
-				New client on the server
-			*/
-			Client new_client;
-			struct sockaddr_in clientAddress;
-			socklen_t clientAddressLength = sizeof(clientAddress);
-			memset(&clientAddress, 0, sizeof(clientAddress));
-			int newClientSocket = accept(_servSocket[i], (struct sockaddr *)&clientAddress, &clientAddressLength);
-			fcntl(newClientSocket, F_SETFL, O_NONBLOCK);
-			new_client.setSockfd(newClientSocket);
-			new_client.setClientAddress(clientAddress);
-			new_client.setClientAdressLenght(clientAddressLength);
-			new_client.setServfd(poll_fds[i].fd);
-			addClientPoll(poll_fds, new_client);
-		}
-		i++;
-	}
+	struct pollfd tmp;
+	memset(&tmp, 0, sizeof(tmp));
+	tmp.fd = client.getSockfd();
+	tmp.events = POLLIN | POLLOUT | POLLERR | POLLHUP;
+	tmp.revents = 0;
+	_pollFds.push_back(tmp);
+	_nbClient++;
+	// Log(BLUE, "INFO", "New client added to poll");
 }
 
-
-
 /*
-	Add the client to the pollsfd for check event.
-	If the max client is reached, the client is rejected and his socket is close. 
+	Close a client socket and earse him of pollfds vector
 */
 
-void	ServerManager::addClientPoll(struct pollfd *poll_fds, Client& client)
+void	ServerManager::closeClientConnection(Client& client)
 {
+	std::vector<struct pollfd>::iterator it = _pollFds.begin();
 	unsigned int i = 0;
-	
-	while (i < MAX_CLIENTS + _servSocket.size())
+
+	while (it != _pollFds.end())
 	{
-		if (poll_fds[i].fd == 0)
+		if (it->fd == client.getSockfd())
 		{
-			poll_fds[i].fd = client.getSockfd();
-			poll_fds[i].events = (POLLIN | POLLHUP | POLLERR | POLLOUT);
+			_pollFds.erase(it);
 			break ;
 		}
+		it++;
+	}
+	while (i < _clients_list.size())
+	{
+		if (_clients_list[i].getSockfd() == client.getSockfd())
+			_clients_list.erase(_clients_list.begin() + i);
 		i++;
 	}
-	if (i >= MAX_CLIENTS + _servSocket.size())
-	{
-		Log(YELLOW, "Maximum number of Client reached. Client rejected");
-		close(client.getSockfd());
-		return ;
-	}
-	_clients_list.push_back(client);
-	Log(GREEN, "INFO", "New client accepted");
-	// std::cout << client << std::endl;
+	close(client.getSockfd());
+	Log(ORANGE, "INFO", "Client connexion closed");
 }
 
-
-
 /*
-	This function search the server corresponding to the fd in the server list
+	find a client in the client list by the fd 
 */
 
-Server& ServerManager::getServByFd(int fd)
+Client& ServerManager::getClientByFd(int fd)
 {
-	std::list<Server>::iterator it = _server_list.begin();
+	std::vector<Client>::iterator it = _clients_list.begin();
 
-	while (it != _server_list.end() && it->getfd() != fd)
+	while(it != _clients_list.end() && it->getSockfd() != fd)
 		it++;
 	return(*it);
 }
 
 
-
 /*
-	Check event on the client socket.
-	If client event is detected, add the data recv to the client objet
+	Read the client's data send
 */
 
-void	ServerManager::checkpollClient(struct pollfd *poll_fds)
+bool	ServerManager::readClientData(Client& client)
 {
+	char buf[50] = {0};
+	int bytes;
+
+	bzero(&buf, 50);
+	bytes = recv(client.getSockfd(), &buf, 50, 0);
+
+	if (bytes <= 0)
+	{
+		//recv error
+		return(false);
+	}
+	buf[bytes] = '\0';
+	client.setDataRecv(buf);
+	client.setLastTime();
+	client.checkEndRequest();
+	return(true);
+}
+
+
+/*
+	This function run an infinite loop and wait event on our servers sockets
+
+	While a clients try to connect to a socket, we catch the event and exec all function for manage them
+*/
+
+void	ServerManager::runServers()
+{
+	int poll_result;
 	unsigned int i = 0;
 
-	while (i < _serv_fds.size())
-		i++;
-	while (i < MAX_CLIENTS + _serv_fds.size())
+	addServToPoll();
+	_nbServer = _pollFds.size();
+	
+	Log(BLUE, "INFO", "Waiting client connexion");
+	while(1)
 	{
-		if (poll_fds[i].revents & (POLLIN | POLLHUP))
+		i = 0;
+		poll_result = poll(&_pollFds[0], _pollFds.size(), -1);
+		if (poll_result < 0)
+			throw	std::runtime_error("Poll() Failed !!");
+		while (i < _pollFds.size())
 		{
-			char buffer[8192];
-			int bytesRead = recv(poll_fds[i].fd, buffer, sizeof(buffer), 0);
-			if (bytesRead <= 0)
+			//Check Server Event
+			if (i < _nbServer)
 			{
-				/*
-					Client's deconnexion or error
-				*/
-				Client& client = findClientByfd(poll_fds[i].fd);
-				client.setInactive();
+				if (_pollFds[i].revents & POLLIN)
+				{
+					Log(GREEN, "INFO", "New connexion detected");
+					int newClientSocket;
+					Client newClient;
+					struct sockaddr_in clientAddress;
+					socklen_t clientAddressLength = sizeof(clientAddress);
+
+					memset(&clientAddress, 0, sizeof(clientAddress));
+					newClientSocket = accept(_pollFds[i].fd, (struct sockaddr *)&clientAddress, &clientAddressLength);
+					setOptionSocket(newClientSocket);
+					newClient.setSockfd(newClientSocket);
+					newClient.setClientAddress(clientAddress);
+					newClient.setClientAdressLenght(clientAddressLength);
+					newClient.setServfd(_pollFds[i].fd);
+					_clients_list.push_back(newClient);
+					addClientToPoll(newClient);
+				}
 			}
+			//Check Client Event
 			else
 			{
-				buffer[bytesRead] = '\0';
-				addDataToClient(poll_fds, i, buffer, bytesRead);
-				checkRequest(poll_fds[i].fd);
+				Client& client = getClientByFd(_pollFds[i].fd);
+
+				if (client.isTimeOut())
+				{
+					send(client.getSockfd(), timeOutPage().c_str(), timeOutPage().size(), 0);
+					Log(ORANGE, "INFO", "Client timeout");
+					client.resetClient();
+					closeClientConnection(client);
+				}
+				else
+				{
+					if (_pollFds[i].revents & POLLIN)
+					{
+						// Log(CYAN, "INFO", "Read data...");
+						readClientData(client);
+					}
+
+					/*
+						Check client socket ready POLLOUT
+					*/
+					if (_pollFds[i].revents & POLLOUT && client.getEndRequest())
+					{
+						if (!client.getResponseBuild())
+							buildResponse(client);
+						client.sendResonse();
+						if (client.getAllResponseSend())
+							client.resetClient();
+					}
+
+					/*
+						Check poll client probl
+					*/
+					if (_pollFds[i].revents & POLLERR || _pollFds[i].revents & POLLHUP)
+						closeClientConnection(client);
+				}
 			}
-			// continue;
+			i++;
 		}
-		// if (poll_fds[i].revents & POLLOUT)
-		// {
-		// 	Client& client = findClientByfd(poll_fds[i].fd);
-		// 	if (client.getRequestDone())
-		// 		execRequest(client);
-		// }
-		i++;
 	}
 }
 
-
-
-/*
-	Add the data recv in the client object
-*/
-
-void	ServerManager::addDataToClient(struct pollfd *poll_fds, int i, char *buffer, int bytesRead)
-{
-	Client& client = findClientByfd(poll_fds[i].fd);
-
-	buffer[bytesRead] = '\0';
-	client.setDataRecv(buffer);
-}
-
-
-
-/*
-	Return the client object find in the list of client
-*/
-
-Client&	ServerManager::findClientByfd(int fd)
-{
-	unsigned int i = 0;
-
-	while(i < _clients_list.size() && _clients_list[i].getSockfd() != fd)
-		i++;
-	return(_clients_list[i]);
-}
-
-
-/*
-	In building
-*/
-
-void	ServerManager::checkClientRequest(struct pollfd *poll_fds)
-{
-	unsigned int i = 0;
-
-	while (i < _serv_fds.size())
-		i++;
-	while (i < MAX_CLIENTS + _serv_fds.size() && poll_fds[i].fd != 0)
-	{
-		Client client = findClientByfd(poll_fds[i].fd);
-		std::cout << CYAN << "Client fd: " << client.getSockfd() << RESET << std::endl;
-		std::cout << CYAN << "Data in client:\n" << client.getDataRecv() << RESET << std::endl;
-		i++;
-	}
-}
-
-
-/*
-	This function check the time of clients are connected.
-	If CONNEXION_TIMEOUT is reached for one or many clients, there status being inactive and they will be deconnected in the runfunction
-*/
-
-void	ServerManager::checkClientsTimeOut()
-{
-	unsigned int i = 0;
-
-	while (i < _clients_list.size())
-	{
-		if (time(NULL) - _clients_list[i].getLastTime() > CONNECTION_TIMEOUT)
-		{
-			Log(YELLOW, "INFO", "Client on connected to fd " + to_string(_clients_list[i].getSockfd()) + " Timeout. Connection will be closed.");
-			send(_clients_list[i].getSockfd(), timeOutPage().c_str(), timeOutPage().size(), 0);
-			_clients_list[i].setInactive();
-		}
-		i++;
-	}
-}
-
-
-
-/*
-	This function check all client's status. If they are inactives, that close there connexions
-*/
-
-void	ServerManager::clearClients(struct pollfd *poll_fds)
-{
-	unsigned int i = 0;
-
-	while (i < _serv_fds.size())
-		i++;
-	while (i < MAX_CLIENTS + _serv_fds.size())
-	{
-		if(poll_fds[i].fd != 0)
-		{
-			Client& client = findClientByfd(poll_fds[i].fd);
-			if (!client.getActive())
-			{
-				eraseClientsListByfd(poll_fds[i].fd);
-				close(poll_fds[i].fd);
-				// Log(YELLOW, "INFO", "Connexion close for client on the socket " + to_string(poll_fds[i].fd));
-				poll_fds[i].fd = 0;
-			}
-		}
-		i++;
-	}
-}
-
-
-
-/*
-	Erase a client in the client list searching by his fd
-*/
-
-void	ServerManager::eraseClientsListByfd(int fd)
-{
-	unsigned int i = 0;
-
-	while (i < _clients_list.size())
-	{
-		if (_clients_list[i].getSockfd() == fd)
-		{
-			_clients_list.erase(_clients_list.begin() + i);
-			return ;
-		}
-		i++;
-	}
-}
-
-
-
-/*
-	Check if the Request is a HTTP.
-	After that check if all request is receive or not
-*/
-
-void	ServerManager::checkRequest(int fd)
-{
-	Client& client = findClientByfd(fd);
-
-	if (!client.isHTTPrequest())
-	{
-		return ;
-	}
-	if (client.allDataReceive())
-	{
-		client.createRequest();
-		client.setRequestDone(true);
-		execRequest(client);
-	}
-}
-
-/*
-	Search the server who's need to response if we have some server on the same host:port
-	
-	If no one corresponding to the server name, first server is used by default
-
-*/
-
-Server ServerManager::getServerForRequest(Client& client)
+Server	ServerManager::getServerForRequest(Client& client)
 {
 	Request request = client.getRequest();
 	std::string host = request.getHeaderByKey("Host");
@@ -527,79 +400,26 @@ Server ServerManager::getServerForRequest(Client& client)
 	return(servers[0]);
 }
 
-/*
-	Print the ServFds. Using for debug
-*/
-
-void	ServerManager::printServfds()
+void	ServerManager::buildResponse(Client& client)
 {
-	std::map<int, std::vector<Server> >::iterator it = _serv_fds.begin();
-	unsigned int i;
-
-	std::cout << BLUE << "Sockets and Servers who's use each socket" << RESET << std::endl;
-	while (it != _serv_fds.end())
-	{
-		i = 0;
-		std::vector<Server> tmp = it->second;
-		std::cout << GREEN << "Socket fd: " << it->first << RESET << std::endl;
-		while (i < tmp.size())
-		{
-			std::cout << "host:port: " << tmp[i].getHost() << ":" << tmp[i].getPort() << " | server_name: " << tmp[i].getName() << std::endl;
-			i++;
-		}
-		std::cout << std::endl;
-		it++;
-	}
-}
-
-void ServerManager::writeToClient(int client_fd, const std::string &str) {
-	const ssize_t nbytes = send(client_fd, str.c_str(), str.length(), 0);
-	if (nbytes == -1)
-	{
-		std::string err = "Error";
-		Log(RED, "INFO", "Failed to send: " + err );
-		// writeToClient(client_fd, str);
-	}
-	else if ((size_t) nbytes < str.length()) {
-		writeToClient(client_fd, str.substr(nbytes));
-	}
-}
-
-
-
-/*------------------------------------------------------------------------*/
-
-void	ServerManager::execRequest(Client& client)
-{
+	client.createRequest();
 	Request request = client.getRequest();
-	Server server = getServerForRequest(client);
+	Server	server = getServerForRequest(client);
 	Response response;
 
-	Log(BLUE, "INFO", "HTTP request received:");
-	std::cout << request << std::endl;
-
-	/*
-	
-		The execution of the request start here! :)
-		So your object or your code will be called here.
-
-		You will receive:
-
-			- Request&: The object who's contains the parsed request
-
-			- Server&: The object who's contains the Server Config
-
-			- Response&: The object who's contains the response that we will send to client
-
-
-		--> When you want test with your code, you can just:
-			- Uncomment lignes below (601 to 606)
-			- Comment last lignes below (608 to 625)
-	*/
-
+	Log(BRIGHT_BLUE, "INFO", "HTTP request received:");
+	std::cout << PURPLE << request << RESET << std::endl;
 	Exec(server, request, response);
-	writeToClient(client.getSockfd(), response.getResponse());
-	Log(MAGENTA, "INFO", "Response:\n" + response.getResponseNoBody());
-	std::cout << CYAN << "---------------------------------------------\n" << RESET << std::endl;
-	client.setInactive();
+	client.setResponse(response.getResponse());
+	Log(ORANGE, "INFO", "Response:");
+	std::cout << CYAN << response << RESET << std::endl;
+	std::cout << "-------------------------------------------------\n" << std::endl;
 }
+
+
+
+
+
+
+
+

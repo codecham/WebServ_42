@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/03 19:30:09 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/11 01:53:05 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/07/12 20:27:26 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,8 +75,8 @@ void	Location::setPath(std::string value)
 void	Location::setRoot(std::string value)
 {
 	isValidToken(value);
-	// if(!(isDirectory(value)))
-	// 	throw std::runtime_error("Root path is not a directory");
+	if(!(isDirectory(value)))
+		throw std::runtime_error("Root path is not a directory");
 	_root = value;
 }
 
@@ -260,6 +260,8 @@ void	Location::isValidPath(std::string& str)
 	if (str.empty())
 		throw std::runtime_error("Invalid path");
 	if (str[0] != '/')
+		throw std::runtime_error("Invalid path");
+	if (!pathIsDirectory(str))
 		throw std::runtime_error("Invalid path");
 	for (std::size_t i = 1; i < str.size(); i++)
 	{

@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 19:40:34 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/11 01:45:51 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/07/12 00:50:08 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ class Location
 		bool								getAutoIndex() const;
 		std::string							getIndex() const;
 		std::vector<bool> 					getMethods() const;
-		std::string  						getRedirection(std::string str);
+		std::string  						getRedirection(std::string str); 
 		std::map<std::string, std::string> 	getRedirectionMap() const;
 		std::vector<std::string> 			getCgiPath() const;
 		std::vector<std::string> 			getCgiExt() const;

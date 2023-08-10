@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/13 00:28:50 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/06/19 02:36:08 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/08 22:39:38 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #define REQUEST_HPP
 
 #include "../../includes/webserv.hpp"
+#include <vector>
 
 class Client;
 class Request {
@@ -26,14 +27,14 @@ class Request {
 		Request& operator=(const Request& copy);
 
 		/* GETTER */
-		std::string 						getMethod();
-		std::string 						getPath();
-		std::string 						getVersion();
-		std::map<std::string, std::string> 	getHeader();
-		std::string 						getBody();
+		std::string 						getMethod() const;
+		std::string 						getPath() const;
+		std::string 						getVersion() const;
+		std::map<std::string, std::string> 	getHeader() const;
+		std::string 						getBody() const;
 		std::string							getHeaderByKey(const std::string& key);
-		std::string							getAllRequest();
-		unsigned long						getBodySize();
+		std::string							getAllRequest() const;
+		long long 							getBodySize() const;
 
 		/* SETTER */
 		void	setMethod(const std::string& str);
@@ -43,7 +44,7 @@ class Request {
 		void	setBody(const std::string& str);
 
 		/* MEMBER FUNCTIONS */
-		void	parseRequest();
+		void	parseHeaders(std::string headers);
 
 	private:
 		/* VARIABLES */
@@ -53,7 +54,7 @@ class Request {
 		std::map<std::string, std::string> 	_header;
 		std::string 						_body;
 		std::string							_allRequest;
-		unsigned long						_bodySize;
+		long long							_bodySize;
 
 		void	setfirstline(std::string str);
 		void	setHeaders(std::string str);

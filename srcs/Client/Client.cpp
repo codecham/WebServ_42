@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/19 02:35:26 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/05 00:46:01 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/09 22:16:40 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,15 @@ Client::Client()
 	memset(&_clientAddress, 0, sizeof(_clientAddress));
 	_clientAddressLenght = sizeof(_clientAddressLenght);
 	_lastTime = time(NULL);
-	_active = true;
+	_isChunk = false;
+	_hasBody = false;
 	_bodySize = 0;
-	_requestDone = false;
+	_initialRead = true;
+	_connexion = KEEP_ALIVE;
+	_endRequest = false;
+	_timeout = false;
+	_done = false;
+	_responseBuild = false;
 }
 
 Client::Client(const Client& copy)
@@ -28,12 +34,21 @@ Client::Client(const Client& copy)
 	_servfd = copy._servfd;
 	_clientAddress = copy._clientAddress;
 	_clientAddressLenght = copy._clientAddressLenght;
-	_dataRecv = copy._dataRecv;
 	_lastTime = copy._lastTime;
-	_active = copy._active;
+	_tmp = copy._tmp;
+	_reqHeader = copy._reqHeader;
+	_reqBody = copy._reqBody;
+	_isChunk = copy._isChunk;
+	_hasBody = copy._hasBody;
 	_bodySize = copy._bodySize;
+	_initialRead = copy._initialRead;
+	_connexion = copy._connexion;
+	_endRequest = copy._endRequest;
+	_timeout = copy._timeout;
 	_request = copy._request;
-	_requestDone = copy._requestDone;
+	_response = copy._response;
+	_done = copy._done;
+	_responseBuild = copy._responseBuild;
 }
 
 Client::~Client()
@@ -49,15 +64,23 @@ Client&	Client::operator=(const Client& copy)
 		_servfd = copy._servfd;
 		_clientAddress = copy._clientAddress;
 		_clientAddressLenght = copy._clientAddressLenght;
-		_dataRecv = copy._dataRecv;
 		_lastTime = copy._lastTime;
-		_active = copy._active;
+		_tmp = copy._tmp;
+		_reqHeader = copy._reqHeader;
+		_reqBody = copy._reqBody;
+		_isChunk = copy._isChunk;
+		_hasBody = copy._hasBody;
 		_bodySize = copy._bodySize;
+		_initialRead = copy._initialRead;
+		_connexion = copy._connexion;
+		_endRequest = copy._endRequest;
+		_timeout = copy._timeout;
 		_request = copy._request;
-		_requestDone = copy._requestDone;
+		_response = copy._response;
+		_done = copy._done;
+		_responseBuild = copy._responseBuild;
 	}
 	return(*this);
-
 }
 
 
@@ -83,29 +106,15 @@ void	Client::setClientAdressLenght(socklen_t clientAddressLenght)
 	_clientAddressLenght = clientAddressLenght;
 }
 
-void	Client::setDataRecv(std::string data)
-{
-	_dataRecv += data;
-}
-
 void	Client::setLastTime()
 {
 	_lastTime = time(NULL);
 }
 
-void	Client::setInactive()
+void	Client::setResponse(std::string response)
 {
-	_active = false;
-}
-
-void 	Client::setRequest(Request& request)
-{
-	_request = request;
-}
-
-void	Client::setRequestDone(bool value)
-{
-	_requestDone = value;
+	_response = response;
+	_responseBuild = true;
 }
 
 /*-----------GETTERS------------*/
@@ -130,24 +139,24 @@ socklen_t 		Client::getClientAddressLenght() const
 	return(_clientAddressLenght);
 }
 
-std::string		Client::getDataRecv() const
-{
-	return(_dataRecv);
-}
-
 time_t			Client::getLastTime() const
 {
 	return(_lastTime);
 }
 
-bool			Client::getActive() const
+bool			Client::getEndRequest() const
 {
-	return(_active);
+	return(_endRequest);
 }
 
-unsigned long	Client::getBodySize() const
+long long		Client::getBodySize() const
 {
 	return(_bodySize);
+}
+
+std::string		Client::getHeaderBody() const
+{
+	return(_reqHeader + _reqBody);
 }
 
 Request		Client::getRequest() const
@@ -155,108 +164,196 @@ Request		Client::getRequest() const
 	return(_request);
 }
 
-bool		Client::getRequestDone() const
+std::string		Client::getHeader() const
 {
-	return(_requestDone);
+	return(_reqHeader);
+}
+
+std::string 	Client::getBody() const
+{
+	return(_reqBody);
+}
+
+bool		Client::getResponseBuild() const
+{
+	return(_responseBuild);
+}
+
+bool		Client::getAllResponseSend() const
+{
+	return(_done);
 }
 
 /*--------MEMBER FUNCTION--------*/
 
-bool			Client::isHTTPrequest()
-{
-	if (!_dataRecv.empty() && strstr(_dataRecv.c_str(), "HTTP") != NULL)
-		return(true);
-	else
-		return(false);
-}
 
-bool			Client::requestFilled()
+void	Client::setDataRecv(std::string data)
 {
-	return(true);
-}
-
-void			Client::closefd()
-{
-	close(_sockfd);
-}
-
-bool			Client::allDataReceive()
-{
-	if (!_dataRecv.empty())
+	if (_initialRead)
 	{
-		const char *end_headers = strstr(_dataRecv.c_str(), "\r\n\r\n");
-		if (end_headers != NULL)
+		_tmp += data;
+		_initialRead = false;
+		separateHeaderBody();
+		if (!_initialRead)
 		{
-			const char *content_lenght = strstr(_dataRecv.c_str(), "Content-Length:");
-			if (content_lenght != NULL)
-			{
-				setBodySize(content_lenght);
-			}
-			return(true);
+			checkBodyOrChunk();
+			checkConnexionType();
 		}
-
 	}
+	else
+		_reqBody.append(data);
+}
+
+
+void			Client::resetClient()
+{
+	_tmp.clear();
+	_isChunk = false;
+	_hasBody = false;
+	_bodySize = 0;
+	_initialRead = true;
+	_connexion = KEEP_ALIVE;
+	_endRequest = false;
+	_reqBody.clear();
+	_reqHeader.clear();
+	_response.clear();
+	_done = false;
+	_responseBuild = false;
+}
+
+void			Client::separateHeaderBody()
+{
+	size_t nFind;
+
+	nFind = _tmp.find("\r\n\r\n");
+	if (nFind != std::string::npos)
+	{
+		_reqHeader = _tmp.substr(0, nFind + 4);
+		if (nFind + 4 < _tmp.length())
+			_reqBody = _tmp.substr(nFind + 4, _tmp.length());
+		_tmp.clear();
+	}
+	else
+		_initialRead = true;
+}
+
+void		Client::checkBodyOrChunk()
+{
+	size_t	nFind;
+	std::string tmp;
+	std::stringstream ss;
+	
+	nFind = _reqHeader.find("Transfer-Encoding: chunked");
+	if (nFind != std::string::npos)
+	{
+		_hasBody = true;
+		_isChunk = true;
+	}
+	else
+	{
+		_isChunk = false;
+		nFind = _reqHeader.find("Content-Length: ");
+		if (nFind != std::string::npos)
+		{
+			_hasBody = true;
+			tmp = _reqHeader.substr(nFind + 16, _reqHeader.length() - (nFind + 16));
+			ss << tmp;
+			ss >> _bodySize;
+		}
+	}
+}
+
+void		Client::checkConnexionType()
+{
+	size_t nFind;
+
+	nFind = _reqHeader.find("Connection: close");
+	if (nFind != std::string::npos)
+		_connexion = CLOSE;
+}
+
+void		Client::checkEndRequest()
+{
+	if (_isChunk && _reqBody.find("\r\n0\r\n") != std::string::npos)
+	{
+		unchunkBody();
+		_endRequest = true;
+	}
+	else if (!_isChunk && _hasBody && (long long)_reqBody.length() >= _bodySize)
+		_endRequest = true;
+	else if (!_initialRead && !_hasBody)
+		_endRequest = true;
+}
+
+void		Client::unchunkBody()
+{
+	std::vector<std::string> split;
+	std::vector<std::string>::iterator it;
+	unsigned long size;
+	std::stringstream unchunked_data;
+
+	splitString(_reqBody, "\r\n", split);
+	it = split.begin();
+	while(it != split.end() && *it != "0")
+	{
+		size = strtol(it->c_str(), NULL, 16);
+		it++;
+		if (it == split.end() || it->length() != size)
+			std::cout << RED << "Wrong size in chunked value" << std::endl;
+		unchunked_data << *it;
+		it++;
+	}
+	_reqBody = unchunked_data.str();
+	_bodySize = _reqBody.length();
+}
+
+void		Client::printRequest()
+{
+	std::cout << _reqHeader << std::endl;
+	std::cout <<  _reqBody  << std::endl;
+}
+
+void		Client::printResponse()
+{
+	std::cout << _response << std::endl;
+}
+
+bool		Client::isTimeOut()
+{
+	if (time(NULL) - _lastTime > CONNECTION_TIMEOUT)
+		return(true);
 	return(false);
 }
 
-void			Client::setBodySize(std::string content_lenght_line)
-{
-	std::size_t index = content_lenght_line.find_first_of("0123456789");
-	std::string bodysize;
-
-	while (index < content_lenght_line.size() && content_lenght_line[index] != '\r')
-	{
-		bodysize += content_lenght_line[index];
-		index++;
-	}
-	index = 0;
-	while(index < bodysize.size())
-	{
-		_bodySize *= 10;
-		_bodySize += bodysize[index];
-		index++;
-	}
-}
-
-bool			Client::checkBodySize(const char *end_header)
-{
-	std::string body = end_header + 5;
-
-	if (body.empty())
-		return(false);
-	else if (body.size() >= _bodySize)
-		return(true);
-	else
-		return(false);
-}
-
-void 			Client::createRequest()
+void		Client::createRequest()
 {
 	Request request(*this);
-
+	
 	_request = request;
 }
 
-/*-------------OSTREAM OPERATOR------------*/
-
-std::ostream& operator<<(std::ostream& os, const Client& client)
+void		Client::reformResponse(int send)
 {
-	struct sockaddr_in clientAddress = client.getClientAddress();
-	std::string clientIP = inet_ntoa(clientAddress.sin_addr);
-	int	clientPort = ntohs(clientAddress.sin_port);
-	short clientFamily = clientAddress.sin_family;
+	_response = _response.substr(send, _response.length() - send);
+	if (_response.empty())
+		_done = true;
+}
 
-	os << "Client fd: " << client.getSockfd() << std::endl;
-	os << "Client IP: " << clientIP << std::endl;
-	os << "Client Port: " << clientPort << std::endl;
-	os << "Client Family: ";
-	if (clientFamily == AF_INET)
-		os << "AF_INET";
-	else if (clientFamily == AF_INET6)
-		os << "AF_INET6";
-	else if (clientFamily == AF_UNSPEC)
-		os << "AF_UNSPEC";
-	os << "\n";
-	os << "Client connected to the server fd: " << client.getServfd() << std::endl;
-	return(os);
+void		Client::sendResonse()
+{
+	int bytesToSend;
+	int bytesSend;
+	
+	if (_response.length() > MAXSEND)
+		bytesToSend = MAXSEND;
+	else
+		bytesToSend = _response.length();
+	bytesSend = send(_sockfd, _response.c_str(), bytesToSend, 0);
+	if (bytesSend == -1)
+	{
+		Log(RED, "INFO", "Error while sending response");
+		_done = true;
+		return;
+	}
+	reformResponse(bytesSend);
 }

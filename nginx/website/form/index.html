@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Form</title>
+  <link rel="stylesheet" href="../styles/styles_redirection.css">
+</head>
+<body>
+	<header>
+		<div class="logo">
+			<a href="../index.html"><img class="logo" src="../images/logos/42.png" alt="42_logo" title="home"/></a>
+		</div>
+		</header>
+  <h2>Formulaire POST</h2>
+  <form id="myForm" action="/submit" method="POST">
+    <label for="firstName">Prénom:</label><br>
+    <input type="text" id="firstName" name="firstName" required><br><br>
+    <label for="lastName">Nom:</label><br>
+    <input type="text" id="lastName" name="lastName" required><br><br>
+    <label for="message">Message:</label><br>
+    <textarea id="message" name="message" rows="4" cols="50"></textarea><br><br>
+    <input type="submit" value="Envoyer">
+  </form>
+
+  <script>
+    document.getElementById("myForm").addEventListener("submit", function(event) {
+      event.preventDefault(); // Empêche le formulaire de se soumettre normalement
+
+      var form = event.target;
+      var formData = new FormData(form);
+
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", form.action, true);
+      xhr.onreadystatechange = function() {
+        if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+          alert("La requête POST a été envoyée avec succès !");
+          // Faire quelque chose avec la réponse du serveur si nécessaire
+        }
+      };
+      xhr.send(formData);
+    });
+  </script>
+</body>
+</html>
