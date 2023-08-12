@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 18:51:08 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/09 22:31:15 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/12 19:09:17 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 Response::Response()
 {
 	_version = "HTTP/1.1";
-	_header.insert(std::make_pair("Connexion", "keep-alive"));
+	// _header.insert(std::make_pair("Connexion", "keep-alive"));
 	create_mimes_types();
 	
 }

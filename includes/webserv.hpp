@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:35:35 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/09 22:40:07 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/12 22:25:20 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,10 +50,10 @@
 #define	MAXREAD	50000
 #define	MAXSEND	50000
 
-#define PRINT_REQ_BODY 0
+#define PRINT_REQ_BODY 1
 #define PRINT_RESP_BODY 0
-#define PRINT_REQ_HEADER 0
-#define PRINT_RESP_HEADER 0
+#define PRINT_REQ_HEADER 1
+#define PRINT_RESP_HEADER 1
 
 #include <sstream>
 #include <map>
@@ -70,8 +70,12 @@
 #include <dirent.h>
 #include <iostream>
 #include <fcntl.h>
+#include "../srcs/Request/Request.hpp"
+#include "../srcs/utils/Log.hpp"
 
 class Response;
+class Request;
+class Log;
 /*--------------------------UTILS------------------------------*/
 void 										strTrimedWhiteSpace(std::string& str);
 bool 										emptyline(std::string& str);
@@ -92,6 +96,7 @@ std::multimap<int, std::string> 			readDirectory(const std::string& folderPath);
 bool										pathIsDirectory(std::string& path);
 int											setOptionSocket(int fd);
 void 										splitString(const std::string& input, const std::string& delimiter, std::vector<std::string>& output);
+int											createBinaryFileFromBody(Request& request, std::string directory);
 
 /*--------------------------UTILS 2------------------------------*/
 

@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:41:29 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/09 22:37:00 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/12 19:12:42 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -278,11 +278,11 @@ Client& ServerManager::getClientByFd(int fd)
 
 bool	ServerManager::readClientData(Client& client)
 {
-	char buf[50] = {0};
+	char buf[1024] = {0};
 	int bytes;
 
-	bzero(&buf, 50);
-	bytes = recv(client.getSockfd(), &buf, 50, 0);
+	bzero(&buf, 1024);
+	bytes = recv(client.getSockfd(), &buf, 1024, 0);
 
 	if (bytes <= 0)
 	{
@@ -290,7 +290,7 @@ bool	ServerManager::readClientData(Client& client)
 		return(false);
 	}
 	buf[bytes] = '\0';
-	client.setDataRecv(buf);
+	client.setDataRecv(buf, bytes);
 	client.setLastTime();
 	client.checkEndRequest();
 	return(true);
@@ -358,7 +358,6 @@ void	ServerManager::runServers()
 				{
 					if (_pollFds[i].revents & POLLIN)
 					{
-						// Log(CYAN, "INFO", "Read data...");
 						readClientData(client);
 					}
 

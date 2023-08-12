@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/19 02:35:26 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/09 22:16:40 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/11 21:21:47 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -187,7 +187,7 @@ bool		Client::getAllResponseSend() const
 /*--------MEMBER FUNCTION--------*/
 
 
-void	Client::setDataRecv(std::string data)
+void	Client::setDataRecv(char *data, int bytes)
 {
 	if (_initialRead)
 	{
@@ -201,7 +201,9 @@ void	Client::setDataRecv(std::string data)
 		}
 	}
 	else
-		_reqBody.append(data);
+	{
+		_reqBody.append(data, bytes);
+	}
 }
 
 

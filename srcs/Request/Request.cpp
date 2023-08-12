@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/13 00:53:15 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/09 22:10:14 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/12 21:58:06 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,6 +172,14 @@ void	Request::setHeaders(std::string str)
 	_header.insert(std::make_pair(vec[0], vec[1]));
 }
 
+
+bool	Request::isUpload()
+{
+	if (_body.find("filename") != std::string::npos)
+		return(true);
+	else
+		return(false);
+}
 
 /*-------------OSTREAM OPERATOR------------*/
 

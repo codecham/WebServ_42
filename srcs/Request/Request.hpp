@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/13 00:28:50 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/08 22:39:38 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/12 21:46:50 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ class Request {
 
 		/* MEMBER FUNCTIONS */
 		void	parseHeaders(std::string headers);
+		bool	isUpload();
 
 	private:
 		/* VARIABLES */

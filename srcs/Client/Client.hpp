@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/17 23:06:05 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/09 18:10:27 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/11 21:21:27 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ class Client
 		/*--------MEMBER FUNCTION--------*/
 		void				resetClient();
 		void				separateHeaderBody();
-		void 				setDataRecv(std::string data);
+		void 				setDataRecv(char *buf, int bytes);
 		void				checkBodyOrChunk();
 		void				checkConnexionType();
 		void				checkEndRequest();

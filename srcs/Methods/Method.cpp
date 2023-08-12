@@ -13,14 +13,39 @@ void	Exec(Server& server, Request& request, Response& response)
 	std::string path = request.getPath();
 	bool		isredirection = false;
 
-	// std::cout << server << std::endl;
+	/*
+		Exemple for a POST method with a upload file:
+
+			When you see that the request is for upload a file you can use the function createBinaryFile
+			
+			PARAM:
+					- Request 
+					- A string that is the directory where the file will be store
+			
+			RETURN
+					- Return the http code (int) that you can use for build response. For exemple, if the upload was sucessfull that's return 200
+	*/
+
+	if (request.getMethod() == "POST" && request.isUpload())
+	{
+		int code;
+		std::string directory;
+
+		if(!location.getUploadStore().empty())
+			directory = location.getUploadStore();
+		else
+			directory = request.getPath();
+
+		code = createBinaryFileFromBody(request, directory);
+		response.createResponse(to_string(code), server);
+		return;
+	}
 
 	if (server.getAllowedMethods("GET"))
 	{
 		if (server.locationExist(path))
 		{
 			location = server.getLocationByPath(path);
-			std::cout << "location found: " << std::endl;
 			redirection = location.getRedirection(path);
 			if (!redirection.empty()) // if redirection exist
 			{

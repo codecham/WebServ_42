@@ -6,10 +6,11 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:48:52 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/08 18:18:23 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/12 19:17:02 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "../Request/Request.hpp"
 #include "../../includes/webserv.hpp"
 
 /*
@@ -341,4 +342,63 @@ int	setOptionSocket(int fd)
 	//?-	Non Blocking fd
 	fcntl(fd, F_SETFL,	O_NONBLOCK);
 	return 0;
+}
+
+void	extractFileName(std::string& information, std::string& fileName)
+{
+	size_t start;
+	size_t end;
+
+	start = information.find("filename=");
+	start += 10;
+	end = information.find("\"", start);
+	fileName = information.substr(start, end - start);
+}
+
+void	separateInformationsBinary(std::string body, std::string& fileName, std::string& binary, std::string separator)
+{
+	size_t nFind;
+	size_t httpSepPos;
+	std::string information;
+	
+	nFind = body.find(separator);
+	httpSepPos = body.find("\r\n\r\n");
+	information = body.substr((nFind + separator.size()), httpSepPos);
+	extractFileName(information, fileName);
+	httpSepPos += 4;
+	binary = body.substr(httpSepPos);
+}
+
+void	getSeparator(Request& request, std::string& separator)
+{
+	size_t nFind;
+	
+	separator = request.getHeaderByKey("Content-Type");
+	nFind = separator.find("boundary=");
+	separator = separator.substr(nFind + 9);
+	
+}
+
+int	createBinaryFileFromBody(Request& request, std::string directory)
+{
+	std::string separator;
+	std::string fileName;
+	std::string binary;
+	std::ofstream file;
+	
+	if (directory[directory.size()] - 1 != '/')
+		directory += "/";
+	getSeparator(request, separator);
+	separateInformationsBinary(request.getBody(), fileName, binary, separator);
+	fileName = directory + fileName;
+	file.open(fileName, std::ios::binary);
+	if (!file)
+	{
+		std::cout << RED << "Can't create " << fileName << RESET << std::endl;
+		return(500);
+	}
+	file.write(binary.c_str(), binary.size());
+	file.close();
+	Log(GREEN, "INFO", fileName + "has been successfully uploaded");
+	return(200);
 }
