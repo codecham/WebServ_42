@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:41:29 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/12 19:12:42 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/12 22:57:03 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ ServerManager::ServerManager(std::list<Server> server_list)
 	checkServers();
 	createSockets();
 	setServfds();
-	signal(SIGPIPE, sigPipeHandler);
+	// signal(SIGPIPE, sigPipeHandler);
 	runServers();
 }
 

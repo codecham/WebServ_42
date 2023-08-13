@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:48:52 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/12 19:17:02 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/13 17:18:41 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -273,7 +273,7 @@ std::string timeOutPage()
 }
 
 
-std::string createErrorPage(std::string& code, std::string& message)
+std::string createErrorPage(const std::string& code, const std::string& message)
 {
 	std::string response;
     response += "<!DOCTYPE html>\n"
@@ -401,4 +401,14 @@ int	createBinaryFileFromBody(Request& request, std::string directory)
 	file.close();
 	Log(GREEN, "INFO", fileName + "has been successfully uploaded");
 	return(200);
+}
+
+std::string readingFile(std::ifstream& file)
+{
+	std::string line;
+	std::string data;
+
+	while(std::getline(file, line))
+		data += line;
+	return(data);
 }

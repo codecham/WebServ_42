@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:35:35 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/12 22:25:20 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/13 18:25:35 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@
 #define	MAXREAD	50000
 #define	MAXSEND	50000
 
-#define PRINT_REQ_BODY 1
+#define PRINT_REQ_BODY 0
 #define PRINT_RESP_BODY 0
 #define PRINT_REQ_HEADER 1
 #define PRINT_RESP_HEADER 1
@@ -91,12 +91,13 @@ std::string 								timeOutPage();
 void 										signalHandler(int sig);
 std::vector<std::string>					splitInVectorByString(std::string& str, std::string cut);
 std::vector<std::string> 					split_key_value_by_c(std::string& str, char c);
-std::string 								createErrorPage(std::string& code, std::string& message);
+std::string 								createErrorPage(const std::string& code, const std::string& message);
 std::multimap<int, std::string> 			readDirectory(const std::string& folderPath);
 bool										pathIsDirectory(std::string& path);
 int											setOptionSocket(int fd);
 void 										splitString(const std::string& input, const std::string& delimiter, std::vector<std::string>& output);
 int											createBinaryFileFromBody(Request& request, std::string directory);
+std::string 								readingFile(std::ifstream& file);
 
 /*--------------------------UTILS 2------------------------------*/
 

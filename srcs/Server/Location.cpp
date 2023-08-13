@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/03 19:30:09 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/12 20:27:26 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/13 18:12:15 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,7 +208,20 @@ std::map<std::string, std::string> 	Location::getRedirectionMap() const
 
 std::string  						Location::getRedirection(std::string str)
 {
-	return(_redirection[str]);
+	size_t nFind;
+	std::string root;
+
+	if (str[str.size() - 1] == '/')
+		return("");
+	nFind = str.find_last_of("/");
+	if (nFind != std::string::npos)
+	{
+		root = str.substr(0, nFind + 1);
+		str = str.substr(nFind + 1);
+	}
+	if (_redirection[str].empty())
+		return("");
+	return(root + _redirection[str]);
 }
 
 std::vector<std::string> 			Location::getCgiPath() const
@@ -259,7 +272,7 @@ void	Location::isValidPath(std::string& str)
 {
 	if (str.empty())
 		throw std::runtime_error("Invalid path");
-	if (str[0] != '/')
+	if (str[0] != '/' || str[str.size() - 1] != '/')
 		throw std::runtime_error("Invalid path");
 	if (!pathIsDirectory(str))
 		throw std::runtime_error("Invalid path");
@@ -274,6 +287,13 @@ void	Location::isValidPath(std::string& str)
 
 bool 	Location::redirectionExist(std::string path)
 {
+	size_t nFind;
+	
+	if (path[path.size() - 1] == '/')
+		return(false);
+	nFind = path.find_last_of("/");
+	if (nFind != std::string::npos)
+		path = path.substr(nFind + 1);
 	if (_redirection.find(path) != _redirection.end())
 		return(true);
 	else

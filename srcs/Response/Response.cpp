@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 18:51:08 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/12 19:09:17 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/13 18:35:01 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -186,6 +186,11 @@ void	Response::buildResponse()
 	std::map<std::string, std::string>::iterator it = _header.begin();
 
 	_response += createline(_version + " " + _code + " " + _message);
+	if (_body.empty())
+	{
+		// _header.insert(std::make_pair("Connection", "close"));
+		_header.insert(std::make_pair("Content-Length", "0"));
+	}
 	while (it != _header.end())
 	{
 		_response += createline(it->first + ": " + it->second);
@@ -295,15 +300,14 @@ void		Response::createResponse(const std::string& code, Server& server)
 	buildResponse();
 }
 
-void		Response::createResponseAutoIndex(const std::string& directory, Server& server)
+void		Response::createResponseAutoIndex(const std::string& directory, Server& server, std::string& path)
 {
 	int status_code;
 	
 	_errors_pages = server.getErrorPages();
 	_server = server;
 	cleanErrorsPage();
-	std::cout << "1" << std::endl;
-	status_code = setAutoIndex(directory);
+	status_code = setAutoIndex(directory, path);
 	if (status_code != 0)
 		setErrorPage(to_string(status_code));
 	buildResponse();
@@ -374,37 +378,32 @@ void		Response::cleanErrorsPage()
 void		Response::setErrorPage(const std::string& code)
 {
 	setCode(code);
-	if (!_errors_pages[atoi(code.c_str())].empty())
-		setPage(_errors_pages[atoi(code.c_str())]);
-	else
-	{
-		_body = createErrorPage(_code, _message);
-		_header.insert(std::make_pair("Content-Type", "text/html"));
-		_header.insert(std::make_pair("Content-Length", to_string(_body.size())));
-	}
+	_body = _server.getErrorPageCode(atoi(code.c_str()));
+	_header.insert(std::make_pair("Content-Type", "text/html"));
+	_header.insert(std::make_pair("Content-Length", to_string(_body.size())));
 }
 
-int			Response::setAutoIndex(const std::string& path)
+int			Response::setAutoIndex(const std::string& directory, std::string& path)
 {
 	DIR *dir;
 	struct stat pathStat;
 	std::multimap<int, std::string> contentMap;
 
-	std::cout << "2" << std::endl;
-	if (stat(path.c_str(), &pathStat) != 0) 
+	if (stat(directory.c_str(), &pathStat) != 0) 
         return (404);
     if (!S_ISDIR(pathStat.st_mode)) 
         return (400);
-	if (!readRights(path))
+	if (!readRights(directory))
 		return(403);
-	dir = opendir(path.c_str());
+	dir = opendir(directory.c_str());
 	if (!dir)
 		return(500);
 	closedir(dir);
-	contentMap = readDirectory(path);
+	contentMap = readDirectory(directory);
 	setCode("200");
-	setHeader("Content-Type:", "text/html");
+	setHeader("Content-Type", "text/html");
 	_body = setHtmlAutoIndexPage(contentMap, path);
+	setHeader("Content-Length", to_string(_body.size()));
 	return(0);
 }
 

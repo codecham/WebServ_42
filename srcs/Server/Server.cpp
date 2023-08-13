@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 13:39:18 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/11 01:53:30 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/13 17:33:53 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,21 +25,7 @@ Server::Server()
 	_index = "";
 	_root = "";
 	_max_body_size = 0;
-	_error_pages[301] = "";
-	_error_pages[302] = "";
-	_error_pages[400] = "";
-	_error_pages[401] = "";
-	_error_pages[402] = "";
-	_error_pages[403] = "";
-	_error_pages[404] = "";
-	_error_pages[405] = "";
-	_error_pages[406] = "";
-	_error_pages[500] = "";
-	_error_pages[501] = "";
-	_error_pages[502] = "";
-	_error_pages[503] = "";
-	_error_pages[504] = "";
-	_error_pages[505] = "";
+	setupErrorPages();
 	_methods.push_back(true); //GET
 	_methods.push_back(false); //POST
 	_methods.push_back(false); //DELETE
@@ -143,6 +129,7 @@ void	Server::setErrorPage(std::string value)
 	std::vector<std::string> vec;
 	long tmp;
 	char *endptr;
+	std::ifstream file;
 
 	isValidToken(value);
 	if (value.empty())
@@ -153,12 +140,17 @@ void	Server::setErrorPage(std::string value)
 	tmp = strtol(vec[0].c_str(), &endptr, 10);
 	if (*endptr)
 		throw std::runtime_error("Wrong Error_page format");
-	if (tmp < 301 || tmp > 505)
-		throw std::runtime_error("Wrong code error. Must be between 301 and 505");
+	if (tmp < 400 || tmp > 505)
+		throw std::runtime_error("Wrong code error. Must be between 400 and 505");
 	/*
 		need to check if the file exist?
 	*/
-	_error_pages.insert(std::make_pair((short)tmp, vec[1]));
+	file.open(vec[1]);
+	if (!file)
+		throw std::runtime_error("Can't open file " + vec[1]);
+	// _error_pages.insert(std::make_pair((short)tmp, readingFile(file)));
+	_error_pages[(short)tmp] = readingFile(file);
+	file.close();
 }
 
 void	Server::setRoot(std::string value)
@@ -260,15 +252,42 @@ std::string						Server::getIndex() const
 
 Location 						Server::getLocationByPath(std::string path)
 {
-	return (_locations[path]);
+		size_t nFind;
+	
+	if (path[path.size() - 1 ] != '/')
+	{
+		nFind = path.find_last_of("/");
+		path = path.substr(0, nFind + 1);
+	}
+	while(1)
+	{
+		if (_locations.find(path) != _locations.end())
+			return (_locations[path]);
+		path.erase(path.size() - 1);
+		nFind = path.find_last_of("/");
+		path = path.substr(0, nFind + 1);
+	}
 }
 
 bool							Server::locationExist(std::string path)
 {
-	if (_locations.find(path) != _locations.end())
-		return (true);
-	else
-		return (false);
+	size_t nFind;
+	
+	if (path[path.size() - 1 ] != '/')
+	{
+		nFind = path.find_last_of("/");
+		path = path.substr(0, nFind + 1);
+	}
+	while(1)
+	{
+		if (_locations.find(path) != _locations.end())
+			return (true);
+		if (path == "/" || path.empty() || path.find("/") == std::string::npos)
+			return (false);
+		path.erase(path.size() - 1);
+		nFind = path.find_last_of("/");
+		path = path.substr(0, nFind + 1);
+	}
 }
 
 int								Server::getfd() const
@@ -351,6 +370,23 @@ void	Server::closeSocket()
 	close(_fd);
 	Log(YELLOW, "SERVER", "Socket closed");
 }
+
+
+void	Server::setupErrorPages()
+{
+	_error_pages[400] = createErrorPage("400", "Bad Request");
+	_error_pages[401] = createErrorPage("401", "Unauthorized");
+	_error_pages[403] = createErrorPage("403", "Forbidden");
+	_error_pages[404] = createErrorPage("404", "Not Found");
+	_error_pages[405] = createErrorPage("405", "Method Not Allowed");
+	_error_pages[406] = createErrorPage("406", "Not Acceptable");
+	_error_pages[500] = createErrorPage("500", "Internal Server Error");
+	_error_pages[501] = createErrorPage("501", "Not Implemented");
+	_error_pages[502] = createErrorPage("502", "Bad Gateway");
+	_error_pages[503] = createErrorPage("503", "Service Unavaible");
+	_error_pages[504] = createErrorPage("504", "Gateway Timeout");
+}
+
 
 /*
 	ostream operator

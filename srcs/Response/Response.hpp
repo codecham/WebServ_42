@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 18:35:06 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/12 19:10:21 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/13 17:27:25 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ class Response
 		void 		buildResponse();
 		void		createResponse(const std::string& code, const std::string& file, Server& server);
 		void		createResponse(const std::string& code, Server& server);
-		void		createResponseAutoIndex(const std::string& directory, Server& server);
+		void		createResponseAutoIndex(const std::string& directory, Server& server, std::string& path);
 
 	private:
 		std::string	_version;
@@ -72,7 +72,7 @@ class Response
 		void		setMimeType(const std::string& fileName);
 		void		cleanErrorsPage();
 		void		setErrorPage(const std::string& code);
-		int			setAutoIndex(const std::string& directory);
+		int			setAutoIndex(const std::string& directory, std::string& path);
 		std::string setHtmlAutoIndexPage(std::multimap<int, std::string>& contentMap, const std::string& path);
 };
 

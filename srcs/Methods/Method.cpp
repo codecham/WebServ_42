@@ -25,18 +25,12 @@ void	Exec(Server& server, Request& request, Response& response)
 			RETURN
 					- Return the http code (int) that you can use for build response. For exemple, if the upload was sucessfull that's return 200
 	*/
-
+	// std::cout << "Server: " << server << std::endl;
 	if (request.getMethod() == "POST" && request.isUpload())
 	{
 		int code;
-		std::string directory;
 
-		if(!location.getUploadStore().empty())
-			directory = location.getUploadStore();
-		else
-			directory = request.getPath();
-
-		code = createBinaryFileFromBody(request, directory);
+		code = createBinaryFileFromBody(request, "/Users/corentin/Desktop/19/webserv_2/");
 		response.createResponse(to_string(code), server);
 		return;
 	}
@@ -46,6 +40,8 @@ void	Exec(Server& server, Request& request, Response& response)
 		if (server.locationExist(path))
 		{
 			location = server.getLocationByPath(path);
+			if (!location.getAllowedMethods("GET"))
+				response.createResponse("403", server);
 			redirection = location.getRedirection(path);
 			if (!redirection.empty()) // if redirection exist
 			{
@@ -61,6 +57,11 @@ void	Exec(Server& server, Request& request, Response& response)
 			{
 				// autoindex is set ?
 					// yes ==> build autoindex response (FINISH)
+				if (location.getAutoIndex())
+				{
+					response.createResponseAutoIndex(fullPath, server, path);
+					return ;
+				}
 				if (!location.getIndex().empty())  // index is set?
 				{
 					fullPath += location.getIndex();

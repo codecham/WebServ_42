@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 01:26:04 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/11 01:51:21 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/13 17:04:06 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ class Server
 		bool locationExist(std::string path);
 		void createSocket();
 		void closeSocket();
+		void setupErrorPages();
 		
 	private:
 		in_addr_t 						_host;
