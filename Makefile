@@ -11,7 +11,9 @@ SRCS			=	srcs/main.cpp \
 					srcs/ServerManager/ServerManager.cpp \
 					srcs/Client/Client.cpp \
 					srcs/Response/Response.cpp \
-					srcs/Methods/Method.cpp \
+					srcs/Methods/methods.cpp \
+					srcs/Methods/get_method.cpp \
+					srcs/Methods/post_method.cpp \
 
 CC				=	clang++
 
@@ -31,7 +33,7 @@ RED				=	\033[38;5;160m
 all: $(NAME)
 
 $(NAME): $(OBJS)
-	$(CC) $(CPPFLAGS) $(OBJS) -o $(NAME) 
+	$(CC) $(CPPFLAGS) $(OBJS) -o $(NAME)
 	@echo "$(GREEN)----------------------------------------------------"
 	@echo "Executable				./$(NAME) $(RESET)"
 
