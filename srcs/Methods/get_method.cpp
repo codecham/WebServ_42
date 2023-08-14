@@ -31,6 +31,11 @@ void	handleGet(Server& server, Request& request, Response& response)
 	if (server.locationExist(path))
 	{
 		location = server.getLocationByPath(path);
+		if (!location.getAllowedMethods("GET"))
+		{
+			response.createResponse("405", server);
+			return ;
+		}
 		redirection = location.getRedirection(path);
 		if (!redirection.empty()) // if redirection exist
 		{
@@ -64,6 +69,11 @@ void	handleGet(Server& server, Request& request, Response& response)
 	}
 	else // Location doesn't exist
 	{
+		if (!server.getAllowedMethods("GET"))
+		{
+			response.createResponse("405", server);
+			return ;
+		}
 		fullPath = server.getRoot() + path;
 		if (isDirectory(fullPath))
 		{
