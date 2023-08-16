@@ -18,7 +18,7 @@
 #include "../Client/Client.hpp"
 #include "../Request/Request.hpp"
 #include "../Response/Response.hpp"
-#include "../Methods/Method.hpp"
+#include "../Methods/methods.hpp"
 #include "../utils/Log.hpp"
 
 #include <iostream>
