@@ -1,7 +1,7 @@
 function getServerURL() {
     var ipAddress = "localhost";
     var port = "4242";
-    var uploadPath = "/upload";
+    var uploadPath = "/upload/";
 
     return "http://" + ipAddress + ":" + port + uploadPath;
 }

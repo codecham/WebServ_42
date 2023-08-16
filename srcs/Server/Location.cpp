@@ -38,6 +38,7 @@ Location::Location(const Location& copy)
 		_cgi_ext = copy._cgi_ext;
 		_cgi_path = copy._cgi_path;
 		_max_body_size = copy._max_body_size;
+		_upload_store = copy._upload_store;
 	}
 }
 
@@ -59,6 +60,7 @@ Location&	Location::operator=(const Location& copy)
 		_cgi_ext = copy._cgi_ext;
 		_cgi_path = copy._cgi_path;
 		_max_body_size = copy._max_body_size;
+		_upload_store = copy._upload_store;
 	}
 	return(*this);
 }
@@ -288,7 +290,7 @@ void	Location::isValidPath(std::string& str)
 bool 	Location::redirectionExist(std::string path)
 {
 	size_t nFind;
-	
+
 	if (path[path.size() - 1] == '/')
 		return(false);
 	nFind = path.find_last_of("/");
