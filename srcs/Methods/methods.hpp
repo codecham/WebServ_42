@@ -10,11 +10,14 @@
 
 # include <iostream>
 # include <cstring>
+# include <cctype>
+# include <string>
 # include <sys/socket.h>
 # include <netinet/in.h>
 # include <arpa/inet.h>
 # include <netdb.h>
 # include <unistd.h>
+# include <vector>
 
 void	Exec(Server& server, Request& request, Response& response);
 void	handlePost(Server& server, Request& request, Response& response);
