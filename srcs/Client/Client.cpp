@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/19 02:35:26 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/11 21:21:47 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/29 03:27:00 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,6 +117,11 @@ void	Client::setResponse(std::string response)
 	_responseBuild = true;
 }
 
+void	Client::setCloseConnexion()
+{
+	_connexion = CLOSE;
+}
+
 /*-----------GETTERS------------*/
 
 int 			Client::getSockfd() const
@@ -206,6 +211,13 @@ void	Client::setDataRecv(char *data, int bytes)
 	}
 }
 
+bool	Client::isCloseConnexion()
+{
+	if (_connexion == CLOSE)
+		return(true);
+	return(false);
+}
+
 
 void			Client::resetClient()
 {
@@ -231,8 +243,10 @@ void			Client::separateHeaderBody()
 	if (nFind != std::string::npos)
 	{
 		_reqHeader = _tmp.substr(0, nFind + 4);
+
 		if (nFind + 4 < _tmp.length())
 			_reqBody = _tmp.substr(nFind + 4, _tmp.length());
+
 		_tmp.clear();
 	}
 	else
@@ -271,12 +285,15 @@ void		Client::checkConnexionType()
 
 	nFind = _reqHeader.find("Connection: close");
 	if (nFind != std::string::npos)
+	{
+		Log(GREEN, "INFO", "Connexion close found");
 		_connexion = CLOSE;
+	}
 }
 
 void		Client::checkEndRequest()
 {
-	if (_isChunk && _reqBody.find("\r\n0\r\n") != std::string::npos)
+	if (_isChunk && _reqBody.find("0\r\n") != std::string::npos)
 	{
 		unchunkBody();
 		_endRequest = true;
@@ -341,7 +358,7 @@ void		Client::reformResponse(int send)
 		_done = true;
 }
 
-void		Client::sendResonse()
+int		Client::sendResonse()
 {
 	int bytesToSend;
 	int bytesSend;
@@ -351,11 +368,18 @@ void		Client::sendResonse()
 	else
 		bytesToSend = _response.length();
 	bytesSend = send(_sockfd, _response.c_str(), bytesToSend, 0);
-	if (bytesSend == -1)
+	// Log(BLUE, "INFO", "Send on socket: " + to_string(_sockfd));
+	if (bytesSend < 0)
 	{
 		Log(RED, "INFO", "Error while sending response");
 		_done = true;
-		return;
+		return(0);
+	}
+	else if (bytesSend == 0)
+	{
+		_done = true;
+		return(0);
 	}
 	reformResponse(bytesSend);
+	return(bytesSend);
 }

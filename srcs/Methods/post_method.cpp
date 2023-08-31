@@ -59,6 +59,13 @@ void	non_upload_file(Server& server, Request& request, Response& response)
 			response.createResponse("405", server);
 			return ;
 		}
+		if (!location.checkMaxBodySize(request.getBodySize()))
+		{
+			response.createResponse("413", server);
+			return;
+		}
+		if (location.isCgiRequest(request.getPath()))
+			return(handleCgi(server, request, location, response));
 	}
 	else
 	{
@@ -66,6 +73,11 @@ void	non_upload_file(Server& server, Request& request, Response& response)
 		{
 			response.createResponse("405", server);
 			return ;
+		}
+		if (!location.checkMaxBodySize(request.getBodySize()))
+		{
+			response.createResponse("413", server);
+			return;
 		}
 	}
 	response.createResponse("204", server);

@@ -7,6 +7,7 @@
 # include "../Request/Request.hpp"
 # include "../Response/Response.hpp"
 # include "../Server/Location.hpp"
+# include "../cgi/Cgi.hpp"
 
 # include <iostream>
 # include <cstring>
@@ -23,6 +24,7 @@
 void	Exec(Server& server, Request& request, Response& response);
 void	handlePost(Server& server, Request& request, Response& response);
 void	handleGet(Server& server, Request& request, Response& response);
+void 	handleCgi(Server& server, Request& request, Location& location, Response& response);
 void	handleDelete(Server& server, Request& request, Response& response);
 
 #endif

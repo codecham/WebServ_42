@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 13:39:18 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/13 17:33:53 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/25 19:37:47 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ Server::Server()
 	_methods.push_back(true); //GET
 	_methods.push_back(false); //POST
 	_methods.push_back(false); //DELETE
+	_methods.push_back(false); //PUT
 	_fd = 0;
 }
 
@@ -184,6 +185,8 @@ void 	Server::setAllowMethod(std::string value)
 		_methods[POST] = true;
 	else if (value == "DELETE")
 		_methods[DELETE] = true;
+	else if (value == "PUT")
+		_methods[PUT] = true;
 	else	throw std::runtime_error("Invalid Allowed Method");
 
 }
@@ -197,6 +200,8 @@ void 	Server::setDenyMethod(std::string value)
 		_methods[POST] = false;
 	else if (value == "DELETE")
 		_methods[DELETE] = false;
+	else if (value == "PUT")
+		_methods[PUT] = false;
 	else
 		throw std::runtime_error("Invalid Allowed Method");
 }
@@ -273,7 +278,7 @@ bool							Server::locationExist(std::string path)
 {
 	size_t nFind;
 	
-	if (path[path.size() - 1 ] != '/')
+	if (path[path.size() - 1] != '/')
 	{
 		nFind = path.find_last_of("/");
 		path = path.substr(0, nFind + 1);
@@ -303,6 +308,8 @@ bool							Server::getAllowedMethods(std::string method) const
 		return(_methods[POST]);
 	if (method == "DELETE")
 		return(_methods[DELETE]);
+	if (method == "PUT")
+		return(_methods[PUT]);
 	return (false);
 }
 
@@ -379,6 +386,7 @@ void	Server::setupErrorPages()
 	_error_pages[403] = createErrorPage("403", "Forbidden");
 	_error_pages[404] = createErrorPage("404", "Not Found");
 	_error_pages[405] = createErrorPage("405", "Method Not Allowed");
+	_error_pages[413] = createErrorPage("413", "Request Entity Too Large");
 	_error_pages[406] = createErrorPage("406", "Not Acceptable");
 	_error_pages[500] = createErrorPage("500", "Internal Server Error");
 	_error_pages[501] = createErrorPage("501", "Not Implemented");
@@ -387,6 +395,27 @@ void	Server::setupErrorPages()
 	_error_pages[504] = createErrorPage("504", "Gateway Timeout");
 }
 
+
+bool 	Server::checkMaxBodySize(unsigned int value) const
+{
+	if (_max_body_size == 0)
+		return(true);
+	if (value > _max_body_size)
+		return(false);
+	return(true);
+}
+
+
+// bool	Server::locationMatch(std::string path, std::string locationPath) const
+// {
+// 	if (locationPath == "/")
+// 		return(false);
+// 	if (path == locationPath)
+// 		return(true);
+// 	path = path.substr(0, locationPath.size());
+	
+	
+// }
 
 /*
 	ostream operator

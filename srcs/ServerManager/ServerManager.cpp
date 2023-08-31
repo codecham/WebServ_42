@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:41:29 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/12 22:57:03 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/29 19:37:33 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ ServerManager::ServerManager(std::list<Server> server_list)
 	checkServers();
 	createSockets();
 	setServfds();
-	// signal(SIGPIPE, sigPipeHandler);
+	signal(SIGPIPE, sigPipeHandler);
 	runServers();
 }
 
@@ -112,8 +112,8 @@ void	ServerManager::createSockets()
 		if (checkduplicate(it))
 		{
 			it->createSocket();
-			fcntl(it->getfd(), F_SETFL, O_NONBLOCK);
-			listen(it->getfd(), MAX_CLIENTS);
+			setOptionSocket(it->getfd());
+			listen(it->getfd(), MAX_CLIENTS * 10);
 		}
 		it++;
 	}
@@ -160,6 +160,17 @@ void	ServerManager::closeServers()
 	}
 }
 
+
+void 	ServerManager::sendMaxClientPage(Client& client)
+{
+	Server serv = getServerForRequest(client);
+	std::string errorPage = serv.getErrorPageCode(503);
+	int bytes;
+
+	bytes = send(client.getSockfd(), errorPage.c_str(), errorPage.size(), 0);
+	if (bytes < 0)
+		Log(RED, "INFO", "Failed to send on socket: " + to_string(client.getSockfd()));
+}
 
 
 /*
@@ -223,11 +234,10 @@ void	ServerManager::addClientToPoll(Client& client)
 	struct pollfd tmp;
 	memset(&tmp, 0, sizeof(tmp));
 	tmp.fd = client.getSockfd();
-	tmp.events = POLLIN | POLLOUT | POLLERR | POLLHUP;
+	tmp.events = POLLIN | POLLOUT | POLLERR | POLLHUP | POLLPRI | POLLNVAL;
 	tmp.revents = 0;
 	_pollFds.push_back(tmp);
 	_nbClient++;
-	// Log(BLUE, "INFO", "New client added to poll");
 }
 
 /*
@@ -237,7 +247,6 @@ void	ServerManager::addClientToPoll(Client& client)
 void	ServerManager::closeClientConnection(Client& client)
 {
 	std::vector<struct pollfd>::iterator it = _pollFds.begin();
-	unsigned int i = 0;
 
 	while (it != _pollFds.end())
 	{
@@ -248,14 +257,10 @@ void	ServerManager::closeClientConnection(Client& client)
 		}
 		it++;
 	}
-	while (i < _clients_list.size())
-	{
-		if (_clients_list[i].getSockfd() == client.getSockfd())
-			_clients_list.erase(_clients_list.begin() + i);
-		i++;
-	}
+	Log(ORANGE, "INFO", "Client connexion closed on socket: " + to_string(client.getSockfd()));
 	close(client.getSockfd());
-	Log(ORANGE, "INFO", "Client connexion closed");
+	_clients_list.erase(client.getSockfd());
+	_nbClient--;
 }
 
 /*
@@ -264,11 +269,11 @@ void	ServerManager::closeClientConnection(Client& client)
 
 Client& ServerManager::getClientByFd(int fd)
 {
-	std::vector<Client>::iterator it = _clients_list.begin();
+	std::map<int, Client>::iterator it = _clients_list.begin();
 
-	while(it != _clients_list.end() && it->getSockfd() != fd)
+	while(it != _clients_list.end() && it->first != fd)
 		it++;
-	return(*it);
+	return(it->second);
 }
 
 
@@ -278,17 +283,18 @@ Client& ServerManager::getClientByFd(int fd)
 
 bool	ServerManager::readClientData(Client& client)
 {
-	char buf[1024] = {0};
+	char buf[5000] = {0};
 	int bytes;
 
-	bzero(&buf, 1024);
-	bytes = recv(client.getSockfd(), &buf, 1024, 0);
-
-	if (bytes <= 0)
+	bzero(&buf, 5000);
+	bytes = recv(client.getSockfd(), &buf, 5000, 0);
+	if (bytes < 0)
 	{
-		//recv error
+		Log(RED, "INFO", "Failed to recv");
 		return(false);
 	}
+	if (bytes == 0)
+		return(true);
 	buf[bytes] = '\0';
 	client.setDataRecv(buf, bytes);
 	client.setLastTime();
@@ -307,10 +313,10 @@ void	ServerManager::runServers()
 {
 	int poll_result;
 	unsigned int i = 0;
+	_nbClient = 0;
 
 	addServToPoll();
 	_nbServer = _pollFds.size();
-	
 	Log(BLUE, "INFO", "Waiting client connexion");
 	while(1)
 	{
@@ -320,33 +326,59 @@ void	ServerManager::runServers()
 			throw	std::runtime_error("Poll() Failed !!");
 		while (i < _pollFds.size())
 		{
-			//Check Server Event
+			/*
+				Check the servers events
+			*/
 			if (i < _nbServer)
 			{
+				/*
+					Check POLLIN event on a server Socket.
+					If POLLIN is detected, create a new Client object and add 
+					it to pollFds and in the list of client
+				*/
 				if (_pollFds[i].revents & POLLIN)
 				{
-					Log(GREEN, "INFO", "New connexion detected");
-					int newClientSocket;
+					int newClientSocket = 0;
 					Client newClient;
 					struct sockaddr_in clientAddress;
 					socklen_t clientAddressLength = sizeof(clientAddress);
-
 					memset(&clientAddress, 0, sizeof(clientAddress));
 					newClientSocket = accept(_pollFds[i].fd, (struct sockaddr *)&clientAddress, &clientAddressLength);
-					setOptionSocket(newClientSocket);
-					newClient.setSockfd(newClientSocket);
-					newClient.setClientAddress(clientAddress);
-					newClient.setClientAdressLenght(clientAddressLength);
-					newClient.setServfd(_pollFds[i].fd);
-					_clients_list.push_back(newClient);
-					addClientToPoll(newClient);
+					Log(GREEN, "INFO", "New client detected");
+					if (newClientSocket >= 0)
+					{
+						setOptionSocket(newClientSocket);
+						newClient.setSockfd(newClientSocket);
+						newClient.setClientAddress(clientAddress);
+						newClient.setClientAdressLenght(clientAddressLength);
+						newClient.setServfd(_pollFds[i].fd);
+						_clients_list.insert(std::make_pair(newClientSocket, newClient));
+						addClientToPoll(newClient);
+						if (_nbClient > MAX_CLIENTS)
+						{
+							Log(BLUE, "INFO", "Maximum number of client reached. The new client will be disconnected: " + to_string(_nbClient));
+							sendMaxClientPage(newClient);
+							closeClientConnection(newClient);	
+						}
+					}
+					else
+						Log(RED, "INFO", "Accept Failed");
 				}
 			}
-			//Check Client Event
+			/*
+				Check the clients events.
+			*/
 			else
 			{
+				/*
+					Get the client object in the client list.
+				*/
 				Client& client = getClientByFd(_pollFds[i].fd);
 
+
+				/*
+					Check if the timout is reached.
+				*/
 				if (client.isTimeOut())
 				{
 					send(client.getSockfd(), timeOutPage().c_str(), timeOutPage().size(), 0);
@@ -356,28 +388,57 @@ void	ServerManager::runServers()
 				}
 				else
 				{
+					/*
+						If POLLIN is detected, read the data in the socket,
+						parse it and add it to client
+					*/
 					if (_pollFds[i].revents & POLLIN)
 					{
-						readClientData(client);
+						if (!readClientData(client))
+							closeClientConnection(client);
 					}
-
+					
 					/*
-						Check client socket ready POLLOUT
+						If the Client socket is ready to POLLOUT and if the HTTP 
+						request is complete, create a HTTP response and send it
 					*/
 					if (_pollFds[i].revents & POLLOUT && client.getEndRequest())
 					{
 						if (!client.getResponseBuild())
 							buildResponse(client);
 						client.sendResonse();
+						
+						/*
+							If all response is send, we reset the client object.
+							If the connexion type is "close", we close the socket 
+							and delete de client of the pollFds and the client list
+						*/
 						if (client.getAllResponseSend())
-							client.resetClient();
+						{
+							if (client.isCloseConnexion())
+							{
+								// client.resetClient();
+								Log(PURPLE, "INFO", "Client is a closed connexion");
+								closeClientConnection(client);
+							}
+							else
+								client.resetClient();
+						}
 					}
-
 					/*
-						Check poll client probl
+						Check the POLLERR and POLLHUP event, and close the 
+						client connexion if it's detected
 					*/
-					if (_pollFds[i].revents & POLLERR || _pollFds[i].revents & POLLHUP)
+					if (_pollFds[i].revents & POLLERR)
+					{
+						Log(RED, "INFO", "POLLERR detected");
 						closeClientConnection(client);
+					}
+					if (_pollFds[i].revents & POLLHUP)
+					{
+						Log(YELLOW, "INFO", "Client close connexion on fd: " + to_string(client.getSockfd()));
+						closeClientConnection(client);
+					}
 				}
 			}
 			i++;
@@ -406,19 +467,13 @@ void	ServerManager::buildResponse(Client& client)
 	Server	server = getServerForRequest(client);
 	Response response;
 
-	Log(BRIGHT_BLUE, "INFO", "HTTP request received:");
+	Log(BRIGHT_BLUE, "INFO", "HTTP request received on socket " + to_string(client.getSockfd()) + ":");
 	std::cout << PURPLE << request << RESET << std::endl;
 	Exec(server, request, response);
 	client.setResponse(response.getResponse());
+	if (response.getConnexionClose())
+		client.setCloseConnexion();
 	Log(ORANGE, "INFO", "Response:");
 	std::cout << CYAN << response << RESET << std::endl;
 	std::cout << "-------------------------------------------------\n" << std::endl;
 }
-
-
-
-
-
-
-
-

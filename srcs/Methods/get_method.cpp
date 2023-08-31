@@ -63,6 +63,8 @@ void	handleGet(Server& server, Request& request, Response& response)
 		}
 		else
 		{
+			if (location.isCgiRequest(request.getPath()))
+				return (handleCgi(server, request, location, response));
 			create_request_responce(server, isredirection, fullPath, response);
 			return ;
 		}
@@ -85,3 +87,4 @@ void	handleGet(Server& server, Request& request, Response& response)
 		return ;
 	}
 }
+

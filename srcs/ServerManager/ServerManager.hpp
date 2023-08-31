@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:18:07 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/09 18:06:47 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/28 18:14:41 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ class ServerManager
 	private:
 		std::list<Server> 					_server_list;
 		std::map<int, std::vector<Server> > _serv_fds;
-		std::vector<Client>					_clients_list;
+		std::map<int, Client>				_clients_list;
 		std::vector<struct pollfd>			_pollFds;
 		unsigned int						_nbServer;
 		unsigned int						_nbClient;
@@ -59,6 +59,7 @@ class ServerManager
 		bool	readClientData(Client& client);
 		void	buildResponse(Client& client);
 		Server	getServerForRequest(Client& client);
+		void	sendMaxClientPage(Client& client);
 };
 
 #endif

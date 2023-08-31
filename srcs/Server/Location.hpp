@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 19:40:34 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/12 00:50:08 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/24 21:04:58 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,10 +49,11 @@ class Location
 		void setAllowMethod(std::string value);
 		void setDenyMethod(std::string value);
 		void setRedirection(std::string value);
-		void setCgiPath(std::string value);
-		void setCgiExt(std::string value);
 		void setClientBodySize(std::string value);
 		void setUploadStore(std::string value);
+		void setCgi(std::string value);
+		void setCgiPath(std::string value);
+
 
 		std::string 						getPath() const;
 		std::string 						getRoot() const;
@@ -61,13 +62,16 @@ class Location
 		std::vector<bool> 					getMethods() const;
 		std::string  						getRedirection(std::string str); 
 		std::map<std::string, std::string> 	getRedirectionMap() const;
-		std::vector<std::string> 			getCgiPath() const;
-		std::vector<std::string> 			getCgiExt() const;
-		unsigned long						getClientBodySize() const;
+		unsigned int						getClientBodySize() const;
 		bool								getAllowedMethods(std::string method) const;
 		std::string 						getUploadStore() const;
+		std::string							getCgiPath() const;
+		std::map<std::string, std::string>	getCgiMap() const;
+		std::string							getCgiInterpreter(std::string ext) const;
 		
 		bool 								redirectionExist(std::string path);
+		bool								isCgiRequest(std::string path) const;
+		bool 								checkMaxBodySize(unsigned int value) const;
 
 	private:
 		std::string							_path;
@@ -76,10 +80,10 @@ class Location
 		std::string							_index;
 		std::vector<bool>					_methods; // 0 -> GET | 1 -> POST | 2 -> DELETE
 		std::map<std::string, std::string>	_redirection;
-		std::vector<std::string>			_cgi_path;
-		std::vector<std::string>			_cgi_ext;
 		unsigned int 						_max_body_size;
 		std::string							_upload_store;
+		std::map<std::string, std::string>	_cgi;
+		std::string							_cgi_path;
 
 		void 	isValidToken(std::string& token);
 		void	isValidPath(std::string& path);

@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 18:35:06 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/13 17:27:25 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/19 02:26:17 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ class Response
 		void setHeader(const std::string& key, const std::string& value);
 		void setBody(const std::string& str);
 		void setPage(const std::string& file);
+		void setConnexionClose();
 
 		/*------------GETTER-----------*/
 		std::string getVersion() const;
@@ -48,9 +49,11 @@ class Response
 		std::string getBody() const;
 		std::string getResponse() const;
 		std::string getResponseNoBody() const;
+		bool		getConnexionClose();
 
 		void 		buildResponse();
 		void		createResponse(const std::string& code, const std::string& file, Server& server);
+		void		createResponse(const std::string& response);
 		void		createResponse(const std::string& code, Server& server);
 		void		createResponseAutoIndex(const std::string& directory, Server& server, std::string& path);
 
@@ -64,6 +67,7 @@ class Response
 		std::map<std::string, std::string> _mimeTypes;
 		std::map<int, std::string>		   _errors_pages;
 		Server	_server;
+		bool	_closeConnexion;
 
 		void		insert_mimes_types(std::string key, std::string value);
 		void		create_mimes_types();

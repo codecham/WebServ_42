@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 00:29:48 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/07/11 01:48:11 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/18 21:00:51 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,14 +214,14 @@ void	ParserConfig::insertParamLocation(Location& location, std::vector<std::stri
 		location.setDenyMethod(value);
 	else if (key == "client_max_body_size")
 		location.setClientBodySize(value);
-	else if (key == "cgi_path")
-		location.setCgiPath(value);
-	else if (key == "cgi_ext")
-		location.setCgiExt(value);
 	else if (key == "return")
 		location.setRedirection(value);
 	else if (key == "upload_store")
 		location.setUploadStore(value);
+	else if (key == "cgi_pass")
+		location.setCgi(value);
+	else if (key == "cgi_bin")
+		location.setCgiPath(value);
 	else
 		throw std::runtime_error("Invalid line");
 }

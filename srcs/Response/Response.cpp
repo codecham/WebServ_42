@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 18:51:08 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/13 18:35:01 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/24 21:12:49 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ Response::Response()
 	_version = "HTTP/1.1";
 	// _header.insert(std::make_pair("Connexion", "keep-alive"));
 	create_mimes_types();
+	_closeConnexion = false;
 	
 }
 
@@ -29,6 +30,7 @@ Response::Response(const Response& copy)
 	_body = copy._body;
 	_mimeTypes = copy._mimeTypes;
 	_errors_pages = copy._errors_pages;
+	_closeConnexion = copy._closeConnexion;
 }
 
 Response::~Response()
@@ -47,6 +49,7 @@ Response&	Response::operator=(const Response& copy)
 		_body = copy._body;
 		_mimeTypes = copy._mimeTypes;
 		_errors_pages = copy._errors_pages;
+		_closeConnexion = copy._closeConnexion;
 	}
 	return(*this);
 }
@@ -89,6 +92,8 @@ void	Response::setCode(const std::string& str)
 		_message = "Not Found";
 	else if (str == "405")
 		_message = "Method Not Allowed";
+	else if (str == "413")
+		_message = "Request Entity Too Large";
 	else if (str == "500")
 		_message = "Internal Server Error";
 	else if (str == "502")
@@ -118,6 +123,11 @@ void	Response::setBody(const std::string& str)
 void	Response::setPage(const std::string& file)
 {
 	addFileToBody(file);
+}
+
+void	Response::setConnexionClose()
+{
+	_closeConnexion = true;
 }
 
 /*
@@ -175,6 +185,11 @@ std::string Response::getResponseNoBody() const
 		it++;
 	}
 	return(response);
+}
+
+bool	Response::getConnexionClose()
+{
+	return(_closeConnexion);
 }
 
 /*
@@ -298,6 +313,16 @@ void		Response::createResponse(const std::string& code, Server& server)
 	else
 		setErrorPage(code);
 	buildResponse();
+}
+
+void		Response::createResponse(const std::string& response)
+{
+	// size_t nFind = response.find("Content-Length:");
+
+	_response = response;
+	// writeStringToFile(response, "myresult.txt");
+	// if (nFind == std::string::npos)
+	// _response += "\r\n";
 }
 
 void		Response::createResponseAutoIndex(const std::string& directory, Server& server, std::string& path)
@@ -446,8 +471,18 @@ std::string Response::setHtmlAutoIndexPage(std::multimap<int, std::string>& cont
 
 std::ostream& operator<<(std::ostream& os, const Response& response)
 {
+	std::string resp;
+	
 	if (PRINT_RESP_BODY)
-		os << response.getResponse();
+	{
+		resp = response.getResponse();
+		if (resp.size() > 1000)
+		{
+			os << resp.substr(0, 1000) << "..." << std::endl;
+		}
+		else
+			os << "[" << resp << "]" << std::endl;
+	}
 	else
 		os << response.getResponseNoBody();
 	return(os);

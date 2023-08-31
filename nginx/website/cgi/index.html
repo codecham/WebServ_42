@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>CGI</title>
+    <link rel="stylesheet" href="../styles/styles_cgi.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <a href="../index.html"><img class="logo" src="../images/logos/42.png" alt="42_logo" title="home"/></a>
+        </div>
+    </header>
+    <div class="center-content">
+        <h1>CGI</h1>
+        <h2>Hello User (script python POST):</h2>
+        <br>
+		<form action="../cgi-bin/get_hello.py" method="post">
+			<label for="first_name">First Name:</label>
+			<input type="text" name="first_name"> <br />
+			<br>
+			<label for="last_name">Last Name:</label>
+			<input type="text" name="last_name" />
+			<input type="submit" value="Submit" /> <br />
+		</form>
+		<br>
+		<br>
+		<h2>Calculator (script pyhton GET):</h2>
+		<form action="../cgi-bin/calc.py" method="get">
+			<label for="f_num">Number1:</label>
+			<input type="text" name="f_num"> <br />
+			<br>
+			<label for="oper">Operator:</label>
+			<input type="text" name="oper"> <br />
+			<br>
+			<label for="s_num">Number2:</label>
+			<input type="text" name="s_num" />
+			<input type="submit" value="Submit" /> <br />
+		</form>
+		<h2>Calendar (script sh):</h2>
+		<form action="/cgi-bin/calendar.sh" method="get">
+			<button type="submit">Generate calendar</button>
+		</form>
+    </div>
+</body>
+</html>

@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/17 23:06:05 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/11 21:21:27 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/19 19:33:51 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ class Client
 		void setClientAdressLenght(socklen_t clientAddressLenght);
 		void setLastTime();
 		void setResponse(std::string response);
+		void setCloseConnexion();
 		
 		/*-----------GETTERS------------*/
 		int 				getSockfd() const;
@@ -75,7 +76,8 @@ class Client
 		bool				isTimeOut();
 		void				createRequest();
 		void				reformResponse(int send);
-		void				sendResonse();
+		int					sendResonse();
+		bool				isCloseConnexion();
 		
 
 	private:

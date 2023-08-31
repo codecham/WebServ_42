@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/03 19:30:09 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/13 18:12:15 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/29 23:59:31 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ Location::Location()
 	_methods.push_back(true); //GET
 	_methods.push_back(false); //POST
 	_methods.push_back(false); //DELETE
+	_methods.push_back(false); //PUT
 	_max_body_size = 0;
 }
 
@@ -35,10 +36,10 @@ Location::Location(const Location& copy)
 		_index = copy._index;
 		_methods = copy._methods;
 		_redirection = copy._redirection;
-		_cgi_ext = copy._cgi_ext;
-		_cgi_path = copy._cgi_path;
 		_max_body_size = copy._max_body_size;
 		_upload_store = copy._upload_store;
+		_cgi = copy._cgi;
+		_cgi_path = copy._cgi_path;
 	}
 }
 
@@ -57,13 +58,20 @@ Location&	Location::operator=(const Location& copy)
 		_index = copy._index;
 		_methods = copy._methods;
 		_redirection = copy._redirection;
-		_cgi_ext = copy._cgi_ext;
-		_cgi_path = copy._cgi_path;
 		_max_body_size = copy._max_body_size;
 		_upload_store = copy._upload_store;
+		_cgi = copy._cgi;
+		_cgi_path = copy._cgi_path;
 	}
 	return(*this);
 }
+
+
+
+
+/*
+	-------------------SETTERS-------------------------
+*/
 
 void	Location::setPath(std::string value)
 {
@@ -108,11 +116,10 @@ void	Location::setAllowMethod(std::string value)
 		_methods[POST] = true;
 	else if (value == "DELETE")
 		_methods[DELETE] = true;
+	else if (value == "PUT")
+		_methods[PUT] = true;
 	else
-	{
-		std::cout << value << " --> ";
 		throw std::runtime_error("Invalid Allowed Method");
-	}
 }
 
 void	Location::setDenyMethod(std::string value)
@@ -124,6 +131,8 @@ void	Location::setDenyMethod(std::string value)
 		_methods[POST] = false;
 	else if (value == "DELETE")
 		_methods[DELETE] = false;
+	else if (value == "PUT")
+		_methods[PUT] = false;
 	else
 		throw std::runtime_error("Invalid Allowed Method");
 }
@@ -141,21 +150,6 @@ void	Location::setRedirection(std::string value)
 	if (it != _redirection.end())
 		throw std::runtime_error("Multiple redirections for same url find");
 	_redirection.insert(std::make_pair(vec[0], vec[1]));
-}
-
-void	Location::setCgiPath(std::string value)
-{
-	isValidToken(value);
-	isValidPath(value);
-	_cgi_path.push_back(value);
-}
-
-void	Location::setCgiExt(std::string value)
-{
-	isValidToken(value);
-	if (value != ".php")
-		throw std::runtime_error("Invalid cgi_ext. Only accepted .php");
-	_cgi_ext.push_back(value);
 }
 
 void	Location::setClientBodySize(std::string value)
@@ -177,6 +171,40 @@ void 	Location::setUploadStore(std::string value)
 	isValidToken(value);
 	_upload_store = value;
 }
+
+
+void	Location::setCgi(std::string value)
+{
+	std::vector<std::string> vec;
+	
+	isValidToken(value);
+	vec = splitInVector(value, ' ');
+	if (vec.size() != 2)
+		throw std::runtime_error("Wrong format for cgi_pass: [EXTENSION] [PATH TO INTERPRETER]");
+	if (vec[0].empty() || vec[1].empty())
+		throw std::runtime_error("Wrong format for cgi_pass: [EXTENSION] [PATH TO INTERPRETER]");
+	if (vec[0][0] != '.' || vec[0].size() < 2)
+		throw std::runtime_error("Wrong format extension for cgi_pass");
+	if (!fileExist(vec[1]))
+		throw std::runtime_error("Can't find the interpreter: " + vec[1]);
+	if (_cgi.find(vec[0]) != _cgi.end())
+		throw std::runtime_error("Redefinition of: " + vec[0]);
+	_cgi[vec[0]] = vec[1];
+}
+
+void	Location::setCgiPath(std::string value)
+{
+	isValidToken(value);
+	if (!_cgi_path.empty())
+		throw std::runtime_error("Redefinition of cgi_bin");
+	_cgi_path = value;
+}
+
+
+
+/*
+	-------------------GETTERS-------------------------
+*/
 
 std::string 						Location::getPath() const
 {
@@ -226,17 +254,7 @@ std::string  						Location::getRedirection(std::string str)
 	return(root + _redirection[str]);
 }
 
-std::vector<std::string> 			Location::getCgiPath() const
-{
-	return (_cgi_path);
-}
-
-std::vector<std::string> 			Location::getCgiExt() const
-{
-	return (_cgi_ext);
-}
-
-unsigned long						Location::getClientBodySize() const
+unsigned int						Location::getClientBodySize() const
 {
 	return (_max_body_size);
 }
@@ -249,6 +267,8 @@ bool								Location::getAllowedMethods(std::string method) const
 		return(_methods[POST]);
 	if (method == "DELETE")
 		return(_methods[DELETE]);
+	if (method == "PUT")
+		return(_methods[PUT]);
 	return (false);
 }
 
@@ -257,6 +277,29 @@ std::string		Location::getUploadStore() const
 	return(_upload_store);
 }
 
+std::string		Location::getCgiPath() const
+{
+	return(_cgi_path);
+}
+
+std::map<std::string, std::string>		Location::getCgiMap() const
+{
+	return(_cgi);
+}
+
+std::string		Location::getCgiInterpreter(std::string ext) const
+{
+	std::map<std::string, std::string>::const_iterator it = _cgi.find(ext);
+
+	if (it == _cgi.end())
+		return("");
+	else
+		return(it->second);
+}
+
+/*
+	-------------------MEMBER FUNCTIONS-------------------------
+*/
 
 void 	Location::isValidToken(std::string& token)
 {
@@ -274,9 +317,7 @@ void	Location::isValidPath(std::string& str)
 {
 	if (str.empty())
 		throw std::runtime_error("Invalid path");
-	if (str[0] != '/' || str[str.size() - 1] != '/')
-		throw std::runtime_error("Invalid path");
-	if (!pathIsDirectory(str))
+	if (str[0] != '/')
 		throw std::runtime_error("Invalid path");
 	for (std::size_t i = 1; i < str.size(); i++)
 	{
@@ -302,13 +343,37 @@ bool 	Location::redirectionExist(std::string path)
 		return(false);
 }
 
+bool	Location::isCgiRequest(std::string path) const
+{
+	std::string ext = extractExtCgi(path);
+
+	if (path.empty())
+		return(false);
+	if (_cgi.find(ext) != _cgi.end())
+		return(true);
+	return(false);
+}
+
+bool 	Location::checkMaxBodySize(unsigned int value) const
+{
+	if (_max_body_size == 0)
+		return(true);
+	if (value > _max_body_size)
+		return(false);
+	return(true);
+}
+
+
+/*
+	-------------------OSTREAM OPERATOR-------------------------
+*/
+
 std::ostream& operator<<(std::ostream& os, const Location& location)
 {
 	std::map<std::string, std::string>	redirection = location.getRedirectionMap();
+	std::map<std::string, std::string>	cgi_map = location.getCgiMap();
 	std::map<std::string, std::string>::iterator it = redirection.begin();
-	std::vector<std::string> cgi_path = location.getCgiPath();
-	std::vector<std::string> cgi_ext = location.getCgiExt();
-	unsigned int i = 0;
+	
 
 	os << "\nlocation " << location.getPath() << " :" << std::endl;
 	os << "root: " << location.getRoot() << std::endl;
@@ -327,24 +392,16 @@ std::ostream& operator<<(std::ostream& os, const Location& location)
 			it++;
 		}
 	}
-	if (!(cgi_path.empty()))
+	it = cgi_map.begin();
+	if (!(cgi_map.empty()))
 	{
-		os << "Cgi path: " << std::endl;
-		while (i < cgi_path.size())
+		os << "cgi_map: " << std::endl;
+		while (it != cgi_map.end())
 		{
-			os << "\t" << cgi_path[i] << std::endl;
-			i++;
+			os << "\t" << it->first << " --> " << it->second << std::endl;
+			it++;
 		}
 	}
-	if (!(cgi_ext.empty()))
-	{
-		i = 0;
-		os << "Cgi ext: " << std::endl;
-		while (i < cgi_ext.size())
-		{
-			os << "\t" << cgi_ext[i] << std::endl;
-			i++;
-		}
-	}
+	os << "cgi_path: " << location.getCgiPath() << std::endl;
 	return(os);
 }

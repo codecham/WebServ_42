@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:35:35 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/13 18:25:35 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/29 03:52:22 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@
 #define GET 0
 #define POST 1
 #define DELETE 2
+#define PUT 3
 
 #define MAX_CLIENTS 1024
 #define CONNECTION_TIMEOUT 30 // Time in seconds before client get kicked out if no data was sent.
@@ -53,13 +54,15 @@
 #define PRINT_REQ_BODY 0
 #define PRINT_RESP_BODY 0
 #define PRINT_REQ_HEADER 1
-#define PRINT_RESP_HEADER 1
+#define PRINT_RESP_HEADER 0
+#define DEBUGMESS 0
 
 #include <sstream>
 #include <map>
 #include <vector>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/resource.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netdb.h>
@@ -98,6 +101,12 @@ int											setOptionSocket(int fd);
 void 										splitString(const std::string& input, const std::string& delimiter, std::vector<std::string>& output);
 int											createBinaryFileFromBody(Request& request, std::string directory);
 std::string 								readingFile(std::ifstream& file);
+std::string 								extractExtCgi(std::string path);
+void 										writeStringToFile(const std::string content, const std::string& filename);
+unsigned int 								fromHexToDec(const std::string& nb);
+void										debugPrint(const std::string& str);
+void										printFdMax();
+void										setOpenMaxFd();
 
 /*--------------------------UTILS 2------------------------------*/
 

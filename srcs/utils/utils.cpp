@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:48:52 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/13 17:18:41 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/29 03:52:08 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -331,15 +331,15 @@ bool	pathIsDirectory(std::string& path)
 
 int	setOptionSocket(int fd)
 {
-	int	optval = 1;
+	// int	optval = 1;
 
-	//?-	Reusable addresss
-	if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)))
-		return 1;
-	//?-	Protection form sigPipe signal
-	if (setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, (void *)&optval, sizeof(optval)))
-		return 1;
-	//?-	Non Blocking fd
+	// //?-	Reusable addresss
+	// if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)))
+	// 	return 1;
+	// //?-	Protection form sigPipe signal
+	// if (setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, (void *)&optval, sizeof(optval)))
+	// 	return 1;
+	// ?-	Non Blocking fd
 	fcntl(fd, F_SETFL,	O_NONBLOCK);
 	return 0;
 }
@@ -411,4 +411,71 @@ std::string readingFile(std::ifstream& file)
 	while(std::getline(file, line))
 		data += line;
 	return(data);
+}
+
+std::string extractExtCgi(std::string path)
+{
+	size_t nFind;
+
+	nFind = path.find_last_of("?");
+	if (nFind != std::string::npos)
+		path = path.substr(0, nFind);
+	nFind = path.find_last_of(".");
+	if (nFind == std::string::npos)
+		return("");
+	return(path.substr(nFind));
+}
+
+void writeStringToFile(const std::string content, const std::string& filename) {
+    // Ouvre le fichier en mode écriture
+    std::ofstream outputFile(filename.c_str());
+
+    // Vérifie si le fichier a été ouvert correctement
+    if (outputFile.is_open()) {
+        // Écrit le contenu dans le fichier
+        outputFile << content;
+        
+        // Ferme le fichier
+        outputFile.close();
+        std::cout << "Le contenu a été écrit dans le fichier " << filename << std::endl;
+    } else {
+        std::cerr << "Impossible d'ouvrir le fichier " << filename << " en écriture." << std::endl;
+    }
+}
+
+unsigned int fromHexToDec(const std::string& nb)
+{
+	unsigned int x;
+	std::stringstream ss;
+	ss << nb;
+	ss >> std::hex >> x;
+	return (x);
+}
+
+void	debugPrint(const std::string& str)
+{
+	if (DEBUGMESS)
+		std::cout << str << std::endl;
+}
+
+
+void	printFdMax()
+{
+	struct rlimit rlim;
+
+	getrlimit(RLIMIT_NOFILE, &rlim);
+	std::cout << "max Open fd = " << rlim.rlim_cur << std::endl;
+}
+
+void	setOpenMaxFd()
+{
+	struct rlimit rlim;
+    
+    rlim.rlim_cur = 4096;
+    rlim.rlim_max = 4096;
+
+    if (setrlimit(RLIMIT_NOFILE, &rlim) == 0)
+        std::cout << "Max open file descriptors updated" << std::endl;
+	else 
+        std::cerr << "Error updating max open file descriptors" << std::endl;
 }
