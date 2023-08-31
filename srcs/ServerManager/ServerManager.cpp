@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:41:29 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/29 19:37:33 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/31 06:50:58 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,7 @@ ServerManager::ServerManager(std::list<Server> server_list)
 	createSockets();
 	setServfds();
 	signal(SIGPIPE, sigPipeHandler);
+	std::signal(SIGINT, &ServerManager::handleCtrlC);
 	runServers();
 }
 
@@ -283,11 +284,11 @@ Client& ServerManager::getClientByFd(int fd)
 
 bool	ServerManager::readClientData(Client& client)
 {
-	char buf[5000] = {0};
+	char buf[1024];
 	int bytes;
 
-	bzero(&buf, 5000);
-	bytes = recv(client.getSockfd(), &buf, 5000, 0);
+	bzero(&buf, 1024);
+	bytes = recv(client.getSockfd(), &buf, 1024, 0);
 	if (bytes < 0)
 	{
 		Log(RED, "INFO", "Failed to recv");
@@ -318,17 +319,17 @@ void	ServerManager::runServers()
 	addServToPoll();
 	_nbServer = _pollFds.size();
 	Log(BLUE, "INFO", "Waiting client connexion");
-	while(1)
+	while(1 && _run)
 	{
 		i = 0;
 		poll_result = poll(&_pollFds[0], _pollFds.size(), -1);
-		if (poll_result < 0)
+		if (poll_result < 0 && _run)
 			throw	std::runtime_error("Poll() Failed !!");
+		/*
+			Check the servers events
+		*/
 		while (i < _pollFds.size())
 		{
-			/*
-				Check the servers events
-			*/
 			if (i < _nbServer)
 			{
 				/*
@@ -395,9 +396,12 @@ void	ServerManager::runServers()
 					if (_pollFds[i].revents & POLLIN)
 					{
 						if (!readClientData(client))
+						{
+							std::cout << "Message for see the result" << std::endl;
 							closeClientConnection(client);
+						}
+						std::cout << "Message for see the result" << std::endl;
 					}
-					
 					/*
 						If the Client socket is ready to POLLOUT and if the HTTP 
 						request is complete, create a HTTP response and send it
@@ -417,7 +421,6 @@ void	ServerManager::runServers()
 						{
 							if (client.isCloseConnexion())
 							{
-								// client.resetClient();
 								Log(PURPLE, "INFO", "Client is a closed connexion");
 								closeClientConnection(client);
 							}
@@ -444,6 +447,9 @@ void	ServerManager::runServers()
 			i++;
 		}
 	}
+	Log(YELLOW, "INFO", "Closing servers....");
+	closeServers();
+	// system("leaks webserv");
 }
 
 Server	ServerManager::getServerForRequest(Client& client)
@@ -476,4 +482,11 @@ void	ServerManager::buildResponse(Client& client)
 	Log(ORANGE, "INFO", "Response:");
 	std::cout << CYAN << response << RESET << std::endl;
 	std::cout << "-------------------------------------------------\n" << std::endl;
+}
+
+
+void ServerManager::handleCtrlC(int signum)
+{
+	if (signum == SIGINT)
+		_run = false;
 }

@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:18:07 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/28 18:14:41 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/31 04:06:09 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,8 @@ class ServerManager
 		ServerManager& operator=(const ServerManager& copy);
 
 
-		void	closeServers();
+		void		closeServers();
+		static void handleCtrlC(int signum);
 
 	private:
 		std::list<Server> 					_server_list;
@@ -46,6 +47,7 @@ class ServerManager
 		std::vector<struct pollfd>			_pollFds;
 		unsigned int						_nbServer;
 		unsigned int						_nbClient;
+		static bool 						_run;
 
 		void	checkServers();
 		void	createSockets();
@@ -61,5 +63,7 @@ class ServerManager
 		Server	getServerForRequest(Client& client);
 		void	sendMaxClientPage(Client& client);
 };
+
+bool ServerManager::_run = true;
 
 #endif

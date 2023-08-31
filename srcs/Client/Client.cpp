@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/19 02:35:26 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/29 03:27:00 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/31 03:57:08 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -206,9 +206,7 @@ void	Client::setDataRecv(char *data, int bytes)
 		}
 	}
 	else
-	{
 		_reqBody.append(data, bytes);
-	}
 }
 
 bool	Client::isCloseConnexion()

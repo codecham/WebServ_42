@@ -38,7 +38,6 @@ void	upload_file(Server& server, Request& request, Response& response)
 			return ;
 		}
 		code = createBinaryFileFromBody(request, fullPath);
-		std::cout << "code: " << code << std::endl;
 		response.createResponse(to_string(code), server);
 	}
 	else
