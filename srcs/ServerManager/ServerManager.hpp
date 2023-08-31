@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:18:07 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/31 04:06:09 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/31 16:25:34 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,7 @@ class ServerManager
 		std::vector<struct pollfd>			_pollFds;
 		unsigned int						_nbServer;
 		unsigned int						_nbClient;
-		static bool 						_run;
+		// static bool 						_run;
 
 		void	checkServers();
 		void	createSockets();
@@ -64,6 +64,6 @@ class ServerManager
 		void	sendMaxClientPage(Client& client);
 };
 
-bool ServerManager::_run = true;
+// bool ServerManager::_run;
 
 #endif

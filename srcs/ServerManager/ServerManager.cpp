@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:41:29 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/31 06:50:58 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/31 16:26:26 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,11 @@ ServerManager::ServerManager(std::list<Server> server_list)
 	_nbClient = 0;
 	_server_list = server_list;
 	checkServers();
+	// ServerManager::_run = true;
 	createSockets();
 	setServfds();
 	signal(SIGPIPE, sigPipeHandler);
-	std::signal(SIGINT, &ServerManager::handleCtrlC);
+	// std::signal(SIGINT, &ServerManager::handleCtrlC);
 	runServers();
 }
 
@@ -319,11 +320,11 @@ void	ServerManager::runServers()
 	addServToPoll();
 	_nbServer = _pollFds.size();
 	Log(BLUE, "INFO", "Waiting client connexion");
-	while(1 && _run)
+	while(1)
 	{
 		i = 0;
 		poll_result = poll(&_pollFds[0], _pollFds.size(), -1);
-		if (poll_result < 0 && _run)
+		if (poll_result < 0)
 			throw	std::runtime_error("Poll() Failed !!");
 		/*
 			Check the servers events
@@ -485,8 +486,8 @@ void	ServerManager::buildResponse(Client& client)
 }
 
 
-void ServerManager::handleCtrlC(int signum)
-{
-	if (signum == SIGINT)
-		_run = false;
-}
+// void ServerManager::handleCtrlC(int signum)
+// {
+// 	if (signum == SIGINT)
+// 		_run = false;
+// }
