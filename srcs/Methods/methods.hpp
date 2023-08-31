@@ -11,6 +11,7 @@
 # include <iostream>
 # include <cstring>
 # include <cctype>
+# include <cstdio>
 # include <string>
 # include <sys/socket.h>
 # include <netinet/in.h>
@@ -22,5 +23,6 @@
 void	Exec(Server& server, Request& request, Response& response);
 void	handlePost(Server& server, Request& request, Response& response);
 void	handleGet(Server& server, Request& request, Response& response);
+void	handleDelete(Server& server, Request& request, Response& response);
 
 #endif

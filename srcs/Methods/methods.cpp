@@ -9,7 +9,7 @@ void	Exec(Server& server, Request& request, Response& response)
 	else if (method == "POST")
 		handlePost(server, request, response);
 	else if (method == "DELETE")
-		std::cout << "DELETE METHOD CALLED"<< std::endl;
+		handleDelete(server, request, response);
 	else
 		response.createResponse("405", server);
 }
