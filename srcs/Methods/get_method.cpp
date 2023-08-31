@@ -37,21 +37,21 @@ void	handleGet(Server& server, Request& request, Response& response)
 			return ;
 		}
 		redirection = location.getRedirection(path);
-		if (!redirection.empty()) // if redirection exist
+		if (!redirection.empty())
 		{
 			path = redirection;
 			isredirection = true;
 		}
 		root = location.getRoot();
-		if (!root.empty()) // if root is set
+		if (!root.empty())
 			fullPath = root + path;
 		else
 			fullPath = server.getRoot() + path;
-		if (isDirectory(fullPath)) // if path is directory
+		if (isDirectory(fullPath))
 		{
 			if (location.getAutoIndex() == true)
 				response.createResponseAutoIndex(fullPath, server, path);
-			if (!location.getIndex().empty())  // index is set?
+			if (!location.getIndex().empty())
 			{
 				fullPath += location.getIndex();
 				create_request_responce(server, isredirection, fullPath, response);
@@ -67,7 +67,7 @@ void	handleGet(Server& server, Request& request, Response& response)
 			return ;
 		}
 	}
-	else // Location doesn't exist
+	else
 	{
 		if (!server.getAllowedMethods("GET"))
 		{
