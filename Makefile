@@ -14,6 +14,7 @@ SRCS			=	srcs/main.cpp \
 					srcs/Methods/methods.cpp \
 					srcs/Methods/get_method.cpp \
 					srcs/Methods/post_method.cpp \
+					srcs/Methods/delete_method.cpp \
 
 CC				=	clang++
 
