@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:18:07 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/31 16:25:34 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/31 17:10:23 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,12 @@ class ServerManager
 
 
 		void		closeServers();
-		static void handleCtrlC(int signum);
+		// static void handleCtrlC(int signum);
+		// static void handleCtrlC(int signum)
+		// {
+		// 	if (signum == SIGINT)
+		// 		_run = false;	
+		// }
 
 	private:
 		std::list<Server> 					_server_list;
@@ -47,7 +52,7 @@ class ServerManager
 		std::vector<struct pollfd>			_pollFds;
 		unsigned int						_nbServer;
 		unsigned int						_nbClient;
-		// static bool 						_run;
+		static bool 						_run;
 
 		void	checkServers();
 		void	createSockets();

@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 13:39:18 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/25 19:37:47 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/31 19:36:44 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@
 Server::Server()
 {	
 	_port = 0;
-	_host = 0;
+	_host = -1;
 	_name = "";
 	_index = "";
 	_root = "";
@@ -143,13 +143,9 @@ void	Server::setErrorPage(std::string value)
 		throw std::runtime_error("Wrong Error_page format");
 	if (tmp < 400 || tmp > 505)
 		throw std::runtime_error("Wrong code error. Must be between 400 and 505");
-	/*
-		need to check if the file exist?
-	*/
 	file.open(vec[1]);
 	if (!file)
 		throw std::runtime_error("Can't open file " + vec[1]);
-	// _error_pages.insert(std::make_pair((short)tmp, readingFile(file)));
 	_error_pages[(short)tmp] = readingFile(file);
 	file.close();
 }

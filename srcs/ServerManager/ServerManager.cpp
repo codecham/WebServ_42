@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:41:29 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/31 16:26:26 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/31 18:48:31 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ void	ServerManager::checkServers()
 	
 	while (it != _server_list.end())
 	{
-		if (it->getHost() <= 0)
+		if (it->getHost() < 0)
 			throw std::runtime_error("host not define or not good for a server");
 		if (it->getPort() <= 0)
 			throw std::runtime_error("Port not define or not good for a server");
@@ -397,11 +397,7 @@ void	ServerManager::runServers()
 					if (_pollFds[i].revents & POLLIN)
 					{
 						if (!readClientData(client))
-						{
-							std::cout << "Message for see the result" << std::endl;
 							closeClientConnection(client);
-						}
-						std::cout << "Message for see the result" << std::endl;
 					}
 					/*
 						If the Client socket is ready to POLLOUT and if the HTTP 
@@ -458,7 +454,12 @@ Server	ServerManager::getServerForRequest(Client& client)
 	Request request = client.getRequest();
 	std::string host = request.getHeaderByKey("Host");
 	std::vector<Server> servers = _serv_fds[client.getServfd()];
+	size_t nFind;
 
+	nFind = host.find(":");
+	if (nFind != std::string::npos)
+		host = host.substr(0, nFind);
+	std::cout << host << std::endl;
 	for (unsigned int i = 0 ; i < servers.size() ; i++)
 	{
 		if (servers[i].getName() == host)
