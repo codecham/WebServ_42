@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/03 19:30:09 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/29 23:59:31 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/31 22:39:19 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -361,6 +361,15 @@ bool 	Location::checkMaxBodySize(unsigned int value) const
 	if (value > _max_body_size)
 		return(false);
 	return(true);
+}
+
+std::string Location::changeRoot(std::string request_path)
+{
+	std::string newPath = _root;
+	std::string cut = request_path.substr(_path.size());
+
+	newPath += cut;
+	return(newPath);
 }
 
 

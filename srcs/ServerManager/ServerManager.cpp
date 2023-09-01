@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:41:29 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/31 18:48:31 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/31 20:50:41 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,9 @@ ServerManager::ServerManager(std::list<Server> server_list)
 	_nbClient = 0;
 	_server_list = server_list;
 	checkServers();
-	// ServerManager::_run = true;
 	createSockets();
 	setServfds();
 	signal(SIGPIPE, sigPipeHandler);
-	// std::signal(SIGINT, &ServerManager::handleCtrlC);
 	runServers();
 }
 
@@ -459,7 +457,6 @@ Server	ServerManager::getServerForRequest(Client& client)
 	nFind = host.find(":");
 	if (nFind != std::string::npos)
 		host = host.substr(0, nFind);
-	std::cout << host << std::endl;
 	for (unsigned int i = 0 ; i < servers.size() ; i++)
 	{
 		if (servers[i].getName() == host)
@@ -485,10 +482,3 @@ void	ServerManager::buildResponse(Client& client)
 	std::cout << CYAN << response << RESET << std::endl;
 	std::cout << "-------------------------------------------------\n" << std::endl;
 }
-
-
-// void ServerManager::handleCtrlC(int signum)
-// {
-// 	if (signum == SIGINT)
-// 		_run = false;
-// }

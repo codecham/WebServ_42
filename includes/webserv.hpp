@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:35:35 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/29 03:52:22 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/31 20:50:47 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@
 #define	MAXREAD	50000
 #define	MAXSEND	50000
 
-#define PRINT_REQ_BODY 0
+#define PRINT_REQ_BODY 1
 #define PRINT_RESP_BODY 0
 #define PRINT_REQ_HEADER 1
 #define PRINT_RESP_HEADER 0
@@ -79,6 +79,7 @@
 class Response;
 class Request;
 class Log;
+
 /*--------------------------UTILS------------------------------*/
 void 										strTrimedWhiteSpace(std::string& str);
 bool 										emptyline(std::string& str);
@@ -108,12 +109,6 @@ void										debugPrint(const std::string& str);
 void										printFdMax();
 void										setOpenMaxFd();
 
-/*--------------------------UTILS 2------------------------------*/
-
-/*
-	You can add here your functions that you code in the file utils/utils2.cpp :)
-
-*/
 
 template <typename T>
 std::string to_string(T value)

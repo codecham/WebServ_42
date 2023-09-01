@@ -44,7 +44,7 @@ void	handleGet(Server& server, Request& request, Response& response)
 		}
 		root = location.getRoot();
 		if (!root.empty())
-			fullPath = root + path;
+			fullPath = location.changeRoot(path);
 		else
 			fullPath = server.getRoot() + path;
 		if (isDirectory(fullPath))
@@ -79,6 +79,12 @@ void	handleGet(Server& server, Request& request, Response& response)
 		fullPath = server.getRoot() + path;
 		if (isDirectory(fullPath))
 		{
+			if (!server.getIndex().empty())
+			{
+				fullPath += server.getIndex();
+				create_request_responce(server, isredirection, fullPath, response);
+				return ;
+			}
 			fullPath += "index.html";
 			create_request_responce(server, isredirection, fullPath, response);
 		}

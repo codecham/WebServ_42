@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:18:07 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/31 17:10:23 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/31 20:48:05 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,12 +38,6 @@ class ServerManager
 
 
 		void		closeServers();
-		// static void handleCtrlC(int signum);
-		// static void handleCtrlC(int signum)
-		// {
-		// 	if (signum == SIGINT)
-		// 		_run = false;	
-		// }
 
 	private:
 		std::list<Server> 					_server_list;

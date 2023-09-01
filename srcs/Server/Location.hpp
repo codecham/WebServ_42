@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 19:40:34 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/24 21:04:58 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/08/31 21:41:08 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -72,6 +72,7 @@ class Location
 		bool 								redirectionExist(std::string path);
 		bool								isCgiRequest(std::string path) const;
 		bool 								checkMaxBodySize(unsigned int value) const;
+		std::string							changeRoot(std::string request_path);
 
 	private:
 		std::string							_path;
