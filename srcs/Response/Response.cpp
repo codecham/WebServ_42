@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/26 18:51:08 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/24 21:12:49 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/03 21:15:30 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,10 +15,9 @@
 Response::Response()
 {
 	_version = "HTTP/1.1";
-	// _header.insert(std::make_pair("Connexion", "keep-alive"));
 	create_mimes_types();
 	_closeConnexion = false;
-	
+	_header["Server"] = "WebServ 1.0";
 }
 
 Response::Response(const Response& copy)

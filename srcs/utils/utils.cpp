@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:48:52 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/29 03:52:08 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/03 23:04:42 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -232,11 +232,6 @@ void sigPipeHandler(int sig)
 	(void)sig;
 }
 
-void signalHandler(int sig)
-{
-	(void)sig;
-}
-
 /*
 	This is just a function who's create a test HTML page
 	add this for get style.css \n<link rel=\"stylesheet\" type=\"text/css\" href=\"styles.css\">
@@ -331,15 +326,6 @@ bool	pathIsDirectory(std::string& path)
 
 int	setOptionSocket(int fd)
 {
-	// int	optval = 1;
-
-	// //?-	Reusable addresss
-	// if (setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)))
-	// 	return 1;
-	// //?-	Protection form sigPipe signal
-	// if (setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, (void *)&optval, sizeof(optval)))
-	// 	return 1;
-	// ?-	Non Blocking fd
 	fcntl(fd, F_SETFL,	O_NONBLOCK);
 	return 0;
 }
@@ -386,8 +372,6 @@ int	createBinaryFileFromBody(Request& request, std::string directory)
 	std::string binary;
 	std::ofstream file;
 	
-	if (directory[directory.size()] - 1 != '/')
-		directory += "/";
 	getSeparator(request, separator);
 	separateInformationsBinary(request.getBody(), fileName, binary, separator);
 	fileName = directory + fileName;
@@ -399,7 +383,7 @@ int	createBinaryFileFromBody(Request& request, std::string directory)
 	}
 	file.write(binary.c_str(), binary.size());
 	file.close();
-	Log(GREEN, "INFO", fileName + "has been successfully uploaded");
+	Log(GREEN, "INFO", fileName + " has been successfully uploaded");
 	return(200);
 }
 
@@ -426,22 +410,6 @@ std::string extractExtCgi(std::string path)
 	return(path.substr(nFind));
 }
 
-void writeStringToFile(const std::string content, const std::string& filename) {
-    // Ouvre le fichier en mode écriture
-    std::ofstream outputFile(filename.c_str());
-
-    // Vérifie si le fichier a été ouvert correctement
-    if (outputFile.is_open()) {
-        // Écrit le contenu dans le fichier
-        outputFile << content;
-        
-        // Ferme le fichier
-        outputFile.close();
-        std::cout << "Le contenu a été écrit dans le fichier " << filename << std::endl;
-    } else {
-        std::cerr << "Impossible d'ouvrir le fichier " << filename << " en écriture." << std::endl;
-    }
-}
 
 unsigned int fromHexToDec(const std::string& nb)
 {

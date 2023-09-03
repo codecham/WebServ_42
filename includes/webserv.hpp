@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:35:35 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/31 20:50:47 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/03 21:12:17 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,10 +51,10 @@
 #define	MAXREAD	50000
 #define	MAXSEND	50000
 
-#define PRINT_REQ_BODY 1
+#define PRINT_REQ_BODY 0
 #define PRINT_RESP_BODY 0
 #define PRINT_REQ_HEADER 1
-#define PRINT_RESP_HEADER 0
+#define PRINT_RESP_HEADER 1
 #define DEBUGMESS 0
 
 #include <sstream>

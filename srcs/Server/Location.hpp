@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 19:40:34 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/31 21:41:08 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/03 20:28:29 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,7 +49,6 @@ class Location
 		void setAllowMethod(std::string value);
 		void setDenyMethod(std::string value);
 		void setRedirection(std::string value);
-		void setClientBodySize(std::string value);
 		void setUploadStore(std::string value);
 		void setCgi(std::string value);
 		void setCgiPath(std::string value);
@@ -62,7 +61,6 @@ class Location
 		std::vector<bool> 					getMethods() const;
 		std::string  						getRedirection(std::string str); 
 		std::map<std::string, std::string> 	getRedirectionMap() const;
-		unsigned int						getClientBodySize() const;
 		bool								getAllowedMethods(std::string method) const;
 		std::string 						getUploadStore() const;
 		std::string							getCgiPath() const;
@@ -71,7 +69,6 @@ class Location
 		
 		bool 								redirectionExist(std::string path);
 		bool								isCgiRequest(std::string path) const;
-		bool 								checkMaxBodySize(unsigned int value) const;
 		std::string							changeRoot(std::string request_path);
 
 	private:
@@ -81,7 +78,6 @@ class Location
 		std::string							_index;
 		std::vector<bool>					_methods; // 0 -> GET | 1 -> POST | 2 -> DELETE
 		std::map<std::string, std::string>	_redirection;
-		unsigned int 						_max_body_size;
 		std::string							_upload_store;
 		std::map<std::string, std::string>	_cgi;
 		std::string							_cgi_path;

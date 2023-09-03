@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 13:39:18 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/31 19:36:44 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/03 23:25:15 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,7 +120,9 @@ void	Server::setMaxBodySize(std::string value)
 	tmp = strtol(value.c_str(), &endptr, 10);
 	if (*endptr)
 		throw std::runtime_error("Wrong character in MaxBodySize");
-	if (tmp < std::numeric_limits<unsigned int>::min() || tmp > std::numeric_limits<unsigned int>::max() || value.size() > 11)
+	if (tmp <= 0)
+		throw std::runtime_error("Max body size need to be 1 or higher");
+	if (tmp < std::numeric_limits<unsigned int>::min() || tmp > std::numeric_limits<unsigned int>::max())
 		throw std::runtime_error("Wrong value for MaxBodySize");
 	_max_body_size = (unsigned int)tmp;
 }
@@ -371,7 +373,7 @@ void 	Server::createSocket()
 void	Server::closeSocket()
 {
 	close(_fd);
-	Log(YELLOW, "SERVER", "Socket closed");
+	Log(YELLOW, "SERVER", "Socket closed: " + to_string(_fd));
 }
 
 

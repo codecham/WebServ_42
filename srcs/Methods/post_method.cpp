@@ -31,7 +31,18 @@ void	upload_file(Server& server, Request& request, Response& response)
 			response.createResponse("405", server);
 			return ;
 		}
-		fullPath = get_absolute_path(server, location);
+		if (!server.checkMaxBodySize(request.getBodySize()))
+		{
+			response.createResponse("413", server);
+			return ;
+		}
+		fullPath = location.getUploadStore();
+		if (!isDirectory(fullPath))
+		{
+			std::cout << RED << fullPath << " is not a directory" << std::endl;
+			response.createResponse("500", server);
+			return ;
+		}
 		if (fullPath.empty() || !isDirectory(fullPath))
 		{
 			response.createResponse("500", server);
@@ -58,10 +69,10 @@ void	non_upload_file(Server& server, Request& request, Response& response)
 			response.createResponse("405", server);
 			return ;
 		}
-		if (!location.checkMaxBodySize(request.getBodySize()))
+		if (!server.checkMaxBodySize(request.getBodySize()))
 		{
 			response.createResponse("413", server);
-			return;
+			return ;
 		}
 		if (location.isCgiRequest(request.getPath()))
 			return(handleCgi(server, request, location, response));
@@ -73,10 +84,10 @@ void	non_upload_file(Server& server, Request& request, Response& response)
 			response.createResponse("405", server);
 			return ;
 		}
-		if (!location.checkMaxBodySize(request.getBodySize()))
+		if (!server.checkMaxBodySize(request.getBodySize()))
 		{
 			response.createResponse("413", server);
-			return;
+			return ;
 		}
 	}
 	response.createResponse("204", server);

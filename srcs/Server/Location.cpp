@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/03 19:30:09 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/31 22:39:19 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/03 20:38:37 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ Location::Location()
 	_methods.push_back(false); //POST
 	_methods.push_back(false); //DELETE
 	_methods.push_back(false); //PUT
-	_max_body_size = 0;
 }
 
 Location::Location(const Location& copy)
@@ -36,7 +35,6 @@ Location::Location(const Location& copy)
 		_index = copy._index;
 		_methods = copy._methods;
 		_redirection = copy._redirection;
-		_max_body_size = copy._max_body_size;
 		_upload_store = copy._upload_store;
 		_cgi = copy._cgi;
 		_cgi_path = copy._cgi_path;
@@ -58,7 +56,6 @@ Location&	Location::operator=(const Location& copy)
 		_index = copy._index;
 		_methods = copy._methods;
 		_redirection = copy._redirection;
-		_max_body_size = copy._max_body_size;
 		_upload_store = copy._upload_store;
 		_cgi = copy._cgi;
 		_cgi_path = copy._cgi_path;
@@ -79,6 +76,8 @@ void	Location::setPath(std::string value)
 	if (vec[1] != "{")
 		throw std::runtime_error("Invalid Location syntax");
 	isValidPath(vec[0]);
+	if (vec[0][vec[0].size() - 1] != '/')
+		vec[0] += '/';
 	_path = vec[0];
 }
 
@@ -150,20 +149,6 @@ void	Location::setRedirection(std::string value)
 	if (it != _redirection.end())
 		throw std::runtime_error("Multiple redirections for same url find");
 	_redirection.insert(std::make_pair(vec[0], vec[1]));
-}
-
-void	Location::setClientBodySize(std::string value)
-{
-	long tmp;
-	char *endptr;
-
-	isValidToken(value);
-	tmp = strtol(value.c_str(), &endptr, 10);
-	if (*endptr)
-		throw std::runtime_error("Wrong character in MaxBodySize");
-	if (tmp < std::numeric_limits<unsigned int>::min() || tmp > std::numeric_limits<unsigned int>::max() || value.size() > 11)
-		throw std::runtime_error("Wrong value for MaxBodySize");
-	_max_body_size = (unsigned int)tmp;
 }
 
 void 	Location::setUploadStore(std::string value)
@@ -252,11 +237,6 @@ std::string  						Location::getRedirection(std::string str)
 	if (_redirection[str].empty())
 		return("");
 	return(root + _redirection[str]);
-}
-
-unsigned int						Location::getClientBodySize() const
-{
-	return (_max_body_size);
 }
 
 bool								Location::getAllowedMethods(std::string method) const
@@ -354,14 +334,6 @@ bool	Location::isCgiRequest(std::string path) const
 	return(false);
 }
 
-bool 	Location::checkMaxBodySize(unsigned int value) const
-{
-	if (_max_body_size == 0)
-		return(true);
-	if (value > _max_body_size)
-		return(false);
-	return(true);
-}
 
 std::string Location::changeRoot(std::string request_path)
 {

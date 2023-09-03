@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/13 00:53:15 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/29 03:26:22 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/03 20:15:30 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -193,6 +193,7 @@ std::ostream& operator<<(std::ostream& os, Request& request)
 {
 	std::map<std::string, std::string> header = request.getHeader();
 	std::map<std::string, std::string>::iterator it = header.begin();
+	std::string body;
 
 	os << request.getMethod() << " ";
 	os << request.getPath() << " ";
@@ -204,8 +205,12 @@ std::ostream& operator<<(std::ostream& os, Request& request)
 	}
 	if (!request.getBody().empty() && PRINT_REQ_BODY)
 	{
+		body = request.getBody();
 		os << "\n";
-		os << request.getBody() << std::endl;
+		if (body.size() < 500)
+			os << body << std::endl;
+		else
+			os << body.substr(0, 500) << "[...]" << std::endl;
 	}
 	return(os);
 }

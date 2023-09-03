@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:41:29 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/31 20:50:41 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/03 23:29:02 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,11 @@ ServerManager::ServerManager(std::list<Server> server_list)
 	_nbServer = 0;
 	_nbClient = 0;
 	_server_list = server_list;
+	_run = true;
 	checkServers();
 	createSockets();
 	setServfds();
 	signal(SIGPIPE, sigPipeHandler);
-	runServers();
 }
 
 ServerManager::ServerManager(const ServerManager& copy)
@@ -41,7 +41,9 @@ ServerManager::ServerManager(const ServerManager& copy)
 
 ServerManager::~ServerManager()
 {
-
+	Log(BLUE, "INFO", "Closing servers....");
+	closeServers();
+	cleanClientList();
 }
 
 ServerManager&	ServerManager::operator=(const ServerManager& copy)
@@ -158,6 +160,11 @@ void	ServerManager::closeServers()
 			it->closeSocket();
 		it++;
 	}
+}
+
+void	ServerManager::cleanClientList()
+{
+	_clients_list.clear();	
 }
 
 
@@ -318,7 +325,7 @@ void	ServerManager::runServers()
 	addServToPoll();
 	_nbServer = _pollFds.size();
 	Log(BLUE, "INFO", "Waiting client connexion");
-	while(1)
+	while(1 && _run)
 	{
 		i = 0;
 		poll_result = poll(&_pollFds[0], _pollFds.size(), -1);
@@ -382,7 +389,6 @@ void	ServerManager::runServers()
 				if (client.isTimeOut())
 				{
 					send(client.getSockfd(), timeOutPage().c_str(), timeOutPage().size(), 0);
-					Log(ORANGE, "INFO", "Client timeout");
 					client.resetClient();
 					closeClientConnection(client);
 				}
@@ -442,9 +448,6 @@ void	ServerManager::runServers()
 			i++;
 		}
 	}
-	Log(YELLOW, "INFO", "Closing servers....");
-	closeServers();
-	// system("leaks webserv");
 }
 
 Server	ServerManager::getServerForRequest(Client& client)

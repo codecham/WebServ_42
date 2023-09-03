@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 00:29:48 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/18 21:00:51 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/03 20:28:01 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -212,8 +212,6 @@ void	ParserConfig::insertParamLocation(Location& location, std::vector<std::stri
 		location.setAllowMethod(value);
 	else if (key == "deny")
 		location.setDenyMethod(value);
-	else if (key == "client_max_body_size")
-		location.setClientBodySize(value);
 	else if (key == "return")
 		location.setRedirection(value);
 	else if (key == "upload_store")
