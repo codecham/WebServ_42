@@ -28,6 +28,7 @@ void	handleGet(Server& server, Request& request, Response& response)
 	std::string path = request.getPath();
 	bool		isredirection = false;
 
+	path = decodeUrl(path);
 	if (server.locationExist(path))
 	{
 		location = server.getLocationByPath(path);
@@ -60,6 +61,7 @@ void	handleGet(Server& server, Request& request, Response& response)
 			fullPath += "/index.html";
 			create_request_responce(server, isredirection, fullPath, response);
 			return ;
+			std::cout << "3" << std::endl;
 		}
 		else
 		{

@@ -177,28 +177,6 @@ void	Cgi::setServerData(Server& server)
 	_port = to_string(server.getPort());
 }
 
-/*
-[AUTH_TYPE] = [Basic]
-[CONTENT_LENGTH] = []
-[CONTENT_TYPE] = []
-[DOCUMENT_ROOT] = [./]
-[GATEWAY_INTERFACE] = [CGI/1.1]
-[HTTP_COOKIE] = [user=]
-[PATH_INFO] = []
-[PATH_TRANSLATED] = [.//]
-[QUERY_STRING] = [f_num=1&oper=+&s_num=2]
-[REDIRECT_STATUS] = [200]
-[REMOTE_ADDR] = [localhost:8002]
-[REQUEST_METHOD] = [GET]
-[REQUEST_URI] = [/cgi-bin/calc.pyf_num=1&oper=+&s_num=2]
-[SCRIPT_FILENAME] = [calc.py]
-[SCRIPT_NAME] = [cgi-bin/calc.py]
-[SERVER_NAME] = [localhost]
-[SERVER_PORT] = [8002]
-[SERVER_PROTOCOL] = [HTTP/1.1]
-[SERVER_SOFTWARE] = [AMANIX]
-*/
-
 void	Cgi::setEnvMap()
 {
 	_envMap["AUTH_TYPE"] = "Basic";

@@ -7,6 +7,7 @@ void	handleDelete(Server& server, Request& request, Response& response)
 	std::string fullPath;
 	std::string	path = request.getPath();
 
+	path = decodeUrl(path);
 	if (server.locationExist(path))
 	{
 		location = server.getLocationByPath(path);

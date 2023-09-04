@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:41:00 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/09/03 23:05:28 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/04 02:38:24 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ void signalHandler(int signal)
 		delete g_manager;
 		g_manager = 0;
 	}
-	// system("leaks webserv");
+	system("leaks webserv");
 	exit(EXIT_SUCCESS);
 }
 
@@ -47,7 +47,6 @@ int main(int argc, char **argv)
 	{
 		ParserConfig config(configfile);						//Send the filename for parsing
 		server_list = config.getServer();						//Get the list of server object created in ParserConfig
-		// ServerManager manager(server_list);
 		g_manager = new ServerManager(server_list);
 		std::signal(SIGINT, (void (*)(int))signalHandler);
 		g_manager->runServers();

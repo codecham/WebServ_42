@@ -23,6 +23,7 @@ void	upload_file(Server& server, Request& request, Response& response)
 	std::string	fullPath;
 	std::string	path = request.getPath();
 
+	path = decodeUrl(path);
 	if (server.locationExist(path))
 	{
 		location = server.getLocationByPath(path);
@@ -37,14 +38,15 @@ void	upload_file(Server& server, Request& request, Response& response)
 			return ;
 		}
 		fullPath = location.getUploadStore();
-		if (!isDirectory(fullPath))
+		if (fullPath.empty())
 		{
-			std::cout << RED << fullPath << " is not a directory" << std::endl;
+			std::cout << RED << "Can't upload file if upload_store is not define" << RESET << std::endl;
 			response.createResponse("500", server);
 			return ;
 		}
-		if (fullPath.empty() || !isDirectory(fullPath))
+		if (!isDirectory(fullPath))
 		{
+			std::cout << RED << fullPath << " is not a directory" << std::endl;
 			response.createResponse("500", server);
 			return ;
 		}
@@ -61,6 +63,7 @@ void	non_upload_file(Server& server, Request& request, Response& response)
 	Location	location;
 	std::string	path = request.getPath();
 
+	path = decodeUrl(path);
 	if (server.locationExist(path))
 	{
 		location = server.getLocationByPath(path);

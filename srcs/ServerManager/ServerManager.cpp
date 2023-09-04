@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:41:29 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/09/03 23:29:02 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/04 04:24:17 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,12 +115,12 @@ void	ServerManager::createSockets()
 		{
 			it->createSocket();
 			setOptionSocket(it->getfd());
-			listen(it->getfd(), MAX_CLIENTS * 10);
+			if (listen(it->getfd(), MAX_CLIENTS) < 0)
+				throw std::runtime_error("listen Failed");
 		}
 		it++;
 	}
 }
-
 
 
 /*
@@ -164,6 +164,13 @@ void	ServerManager::closeServers()
 
 void	ServerManager::cleanClientList()
 {
+	std::map<int, Client>::iterator it = _clients_list.begin();
+	
+	while(it != _clients_list.end())
+	{
+		close(it->second.getSockfd());
+		it++;
+	}
 	_clients_list.clear();	
 }
 
@@ -241,7 +248,7 @@ void	ServerManager::addClientToPoll(Client& client)
 	struct pollfd tmp;
 	memset(&tmp, 0, sizeof(tmp));
 	tmp.fd = client.getSockfd();
-	tmp.events = POLLIN | POLLOUT | POLLERR | POLLHUP | POLLPRI | POLLNVAL;
+	tmp.events = POLLIN | POLLOUT | POLLERR | POLLHUP;
 	tmp.revents = 0;
 	_pollFds.push_back(tmp);
 	_nbClient++;

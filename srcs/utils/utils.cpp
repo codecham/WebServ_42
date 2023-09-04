@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 12:48:52 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/09/03 23:04:42 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/04 04:31:12 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -420,30 +420,16 @@ unsigned int fromHexToDec(const std::string& nb)
 	return (x);
 }
 
-void	debugPrint(const std::string& str)
+std::string decodeUrl(std::string str)
 {
-	if (DEBUGMESS)
-		std::cout << str << std::endl;
-}
-
-
-void	printFdMax()
-{
-	struct rlimit rlim;
-
-	getrlimit(RLIMIT_NOFILE, &rlim);
-	std::cout << "max Open fd = " << rlim.rlim_cur << std::endl;
-}
-
-void	setOpenMaxFd()
-{
-	struct rlimit rlim;
-    
-    rlim.rlim_cur = 4096;
-    rlim.rlim_max = 4096;
-
-    if (setrlimit(RLIMIT_NOFILE, &rlim) == 0)
-        std::cout << "Max open file descriptors updated" << std::endl;
-	else 
-        std::cerr << "Error updating max open file descriptors" << std::endl;
+	size_t token = str.find("%");
+	while (token != std::string::npos)
+	{
+		if (str.length() < token + 2)
+			break ;
+		char decimal = fromHexToDec(str.substr(token + 1, 2));
+		str.replace(token, 3, to_string(decimal));
+		token = str.find("%");
+	}
+	return (str);
 }

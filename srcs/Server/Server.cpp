@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 13:39:18 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/09/03 23:25:15 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/04 04:30:46 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ Server::Server()
 	_methods.push_back(true); //GET
 	_methods.push_back(false); //POST
 	_methods.push_back(false); //DELETE
-	_methods.push_back(false); //PUT
 	_fd = 0;
 }
 
@@ -183,8 +182,6 @@ void 	Server::setAllowMethod(std::string value)
 		_methods[POST] = true;
 	else if (value == "DELETE")
 		_methods[DELETE] = true;
-	else if (value == "PUT")
-		_methods[PUT] = true;
 	else	throw std::runtime_error("Invalid Allowed Method");
 
 }
@@ -198,8 +195,6 @@ void 	Server::setDenyMethod(std::string value)
 		_methods[POST] = false;
 	else if (value == "DELETE")
 		_methods[DELETE] = false;
-	else if (value == "PUT")
-		_methods[PUT] = false;
 	else
 		throw std::runtime_error("Invalid Allowed Method");
 }
@@ -255,8 +250,11 @@ std::string						Server::getIndex() const
 
 Location 						Server::getLocationByPath(std::string path)
 {
-		size_t nFind;
+	size_t nFind;
+	std::map<std::string, Location>::iterator it = _locations.find(path + "/");
 	
+	if (it != _locations.end())
+		return(it->second);
 	if (path[path.size() - 1 ] != '/')
 	{
 		nFind = path.find_last_of("/");
@@ -275,7 +273,10 @@ Location 						Server::getLocationByPath(std::string path)
 bool							Server::locationExist(std::string path)
 {
 	size_t nFind;
+	std::map<std::string, Location>::iterator it = _locations.find(path + "/");
 	
+	if (it != _locations.end())
+		return(true);
 	if (path[path.size() - 1] != '/')
 	{
 		nFind = path.find_last_of("/");
@@ -306,8 +307,6 @@ bool							Server::getAllowedMethods(std::string method) const
 		return(_methods[POST]);
 	if (method == "DELETE")
 		return(_methods[DELETE]);
-	if (method == "PUT")
-		return(_methods[PUT]);
 	return (false);
 }
 
@@ -402,18 +401,6 @@ bool 	Server::checkMaxBodySize(unsigned int value) const
 		return(false);
 	return(true);
 }
-
-
-// bool	Server::locationMatch(std::string path, std::string locationPath) const
-// {
-// 	if (locationPath == "/")
-// 		return(false);
-// 	if (path == locationPath)
-// 		return(true);
-// 	path = path.substr(0, locationPath.size());
-	
-	
-// }
 
 /*
 	ostream operator

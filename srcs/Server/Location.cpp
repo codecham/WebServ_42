@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/03 19:30:09 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/09/03 20:38:37 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/04 03:52:16 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@ Location::Location()
 	_methods.push_back(true); //GET
 	_methods.push_back(false); //POST
 	_methods.push_back(false); //DELETE
-	_methods.push_back(false); //PUT
 }
 
 Location::Location(const Location& copy)
@@ -115,8 +114,6 @@ void	Location::setAllowMethod(std::string value)
 		_methods[POST] = true;
 	else if (value == "DELETE")
 		_methods[DELETE] = true;
-	else if (value == "PUT")
-		_methods[PUT] = true;
 	else
 		throw std::runtime_error("Invalid Allowed Method");
 }
@@ -130,8 +127,6 @@ void	Location::setDenyMethod(std::string value)
 		_methods[POST] = false;
 	else if (value == "DELETE")
 		_methods[DELETE] = false;
-	else if (value == "PUT")
-		_methods[PUT] = false;
 	else
 		throw std::runtime_error("Invalid Allowed Method");
 }
@@ -247,8 +242,6 @@ bool								Location::getAllowedMethods(std::string method) const
 		return(_methods[POST]);
 	if (method == "DELETE")
 		return(_methods[DELETE]);
-	if (method == "PUT")
-		return(_methods[PUT]);
 	return (false);
 }
 
@@ -337,6 +330,8 @@ bool	Location::isCgiRequest(std::string path) const
 
 std::string Location::changeRoot(std::string request_path)
 {
+	if (request_path + "/" == _path)
+		request_path += "/";
 	std::string newPath = _root;
 	std::string cut = request_path.substr(_path.size());
 

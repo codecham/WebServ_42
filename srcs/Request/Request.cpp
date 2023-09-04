@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/13 00:53:15 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/09/03 20:15:30 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/04 04:31:54 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,14 +20,10 @@ Request::Request()
 
 Request::Request(Client& client)
 {
-	debugPrint("5.1.1.1");
 	parseHeaders(client.getHeader());
-	debugPrint("5.1.1.2");
 	_bodySize = client.getBodySize();
-	debugPrint("5.1.1.3");
 	if (_bodySize > 0)
 		_body = client.getBody();
-	debugPrint("5.1.1.4");
 }
 
 Request::Request(const Request& copy)

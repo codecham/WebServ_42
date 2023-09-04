@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/25 01:26:04 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/25 14:39:56 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/04 03:45:41 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,6 @@ class Server
 		
 		void isValidToken(std::string& token) const;
 		bool isValidHost(std::string host) const;
-		bool locationMatch(std::string path, std::string locationPath) const;
 };
 
 std::ostream& operator<<(std::ostream& os, const Server& server);
