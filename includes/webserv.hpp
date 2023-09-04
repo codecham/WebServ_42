@@ -44,7 +44,7 @@
 #define POST 1
 #define DELETE 2
 
-#define MAX_CLIENTS 1
+#define MAX_CLIENTS 1024
 #define CONNECTION_TIMEOUT 30 // Time in seconds before client get kicked out if no data was sent.
 
 #define	MAXREAD	50000
