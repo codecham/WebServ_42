@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/19 02:35:26 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/08/31 03:57:08 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/04 04:40:54 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -284,7 +284,6 @@ void		Client::checkConnexionType()
 	nFind = _reqHeader.find("Connection: close");
 	if (nFind != std::string::npos)
 	{
-		Log(GREEN, "INFO", "Connexion close found");
 		_connexion = CLOSE;
 	}
 }

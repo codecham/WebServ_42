@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/06/15 15:41:29 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/09/04 04:24:17 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/04 04:47:16 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -274,7 +274,8 @@ void	ServerManager::closeClientConnection(Client& client)
 	Log(ORANGE, "INFO", "Client connexion closed on socket: " + to_string(client.getSockfd()));
 	close(client.getSockfd());
 	_clients_list.erase(client.getSockfd());
-	_nbClient--;
+	if (_nbClient > 0)
+		_nbClient--;
 }
 
 /*
@@ -428,10 +429,7 @@ void	ServerManager::runServers()
 						if (client.getAllResponseSend())
 						{
 							if (client.isCloseConnexion())
-							{
-								Log(PURPLE, "INFO", "Client is a closed connexion");
 								closeClientConnection(client);
-							}
 							else
 								client.resetClient();
 						}
@@ -441,15 +439,9 @@ void	ServerManager::runServers()
 						client connexion if it's detected
 					*/
 					if (_pollFds[i].revents & POLLERR)
-					{
-						Log(RED, "INFO", "POLLERR detected");
 						closeClientConnection(client);
-					}
 					if (_pollFds[i].revents & POLLHUP)
-					{
-						Log(YELLOW, "INFO", "Client close connexion on fd: " + to_string(client.getSockfd()));
 						closeClientConnection(client);
-					}
 				}
 			}
 			i++;

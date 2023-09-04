@@ -6,7 +6,7 @@
 /*   By: dcorenti <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/05/24 23:35:35 by dcorenti          #+#    #+#             */
-/*   Updated: 2023/09/04 04:30:18 by dcorenti         ###   ########.fr       */
+/*   Updated: 2023/09/04 04:44:55 by dcorenti         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@
 #define POST 1
 #define DELETE 2
 
-#define MAX_CLIENTS 1024
+#define MAX_CLIENTS 1
 #define CONNECTION_TIMEOUT 30 // Time in seconds before client get kicked out if no data was sent.
 
 #define	MAXREAD	50000
