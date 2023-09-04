@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   get_method.cpp                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: dduvivie <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/09/04 12:11:17 by dduvivie          #+#    #+#             */
+/*   Updated: 2023/09/04 12:11:19 by dduvivie         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "methods.hpp"
 
 void	create_request_responce(Server& server, bool isredirection, std::string fullPath, Response& response)
